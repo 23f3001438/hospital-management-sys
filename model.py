@@ -31,3 +31,55 @@ class Admin(db.Model):
     password = db.Column(db.String(255), nullable=False)
     contact = db.Column(db.String, nullable=False)
     name = db.Column(db.String(), nullable=False)
+
+class Application(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
+    status = db.Column(db.String(50), nullable=False, default='Pending')
+
+    patient = db.relationship('Patient', backref=db.backref('applications', lazy=True))
+    doctor = db.relationship('Doctor', backref=db.backref('applications', lazy=True))
+
+class Prescription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    medications = db.Column(db.Text, nullable=False)
+    notes = db.Column(db.Text)
+
+    patient = db.relationship('Patient', backref=db.backref('prescriptions', lazy=True))
+    doctor = db.relationship('Doctor', backref=db.backref('prescriptions', lazy=True))
+
+class MedicalRecord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    record_date = db.Column(db.Date, nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    treatment = db.Column(db.Text)
+
+    patient = db.relationship('Patient', backref=db.backref('medical_records', lazy=True))
+
+class Billing(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    billing_date = db.Column(db.Date, nullable=False)
+    details = db.Column(db.Text)
+
+    patient = db.relationship('Patient', backref=db.backref('billings', lazy=True))
+
+class HospitalAccounts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    total_revenue = db.Column(db.Float, nullable=False, default=0.0)
+    total_expenses = db.Column(db.Float, nullable=False, default=0.0)
+
+    def update_revenue(self, amount):
+        self.total_revenue += amount
+
+    def update_expenses(self, amount):
+        self.total_expenses += amount
+
