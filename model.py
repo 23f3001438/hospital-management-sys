@@ -13,6 +13,10 @@ class Patient(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     address = db.Column(db.Text, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    appointments = db.relationship('Application', backref='patient', lazy=True)
+    prescriptions = db.relationship('Prescription', backref='patient', lazy=True)
+    medical_records = db.relationship('MedicalRecord', backref='patient', lazy=True)
+    billings = db.relationship('Billing', backref='patient', lazy=True)
 
 class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -24,6 +28,8 @@ class Doctor(db.Model):
     specialisation = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    appointments = db.relationship('Application', backref='doctor', lazy=True)
+    prescriptions = db.relationship('Prescription', backref='doctor', lazy=True)
 
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -31,6 +37,7 @@ class Admin(db.Model):
     password = db.Column(db.String(255), nullable=False)
     contact = db.Column(db.String, nullable=False)
     name = db.Column(db.String(), nullable=False)
+    hospital_accounts = db.relationship('HospitalAccounts', backref='admin', lazy=True)
 
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
