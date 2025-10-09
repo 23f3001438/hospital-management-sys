@@ -72,12 +72,22 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        role = request.form.get('role')
         username = request.form.get('username')
         password = request.form.get('password')
 
-        user = Patient.query.filter_by(username=username).first()
+        if role == 'patient':
+            user = Patient.query.filter_by(username=username).first()
+        elif role == 'doctor':
+            user = Doctor.query.filter_by(username=username).first()
+        elif role == 'admin':
+            user = Admin.query.filter_by(username=username).first()
+        else:
+            flash('Invalid role selected.', 'error')
+            return redirect('/login')
+
         if user and check_password_hash(user.password, password):
-            flash('Login successful!', 'success')
+            flash(f'Login successful as {role}!', 'success')
             return redirect(url_for('home'))
         else:
             flash('Invalid username or password.', 'error')
