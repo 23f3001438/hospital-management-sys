@@ -95,6 +95,21 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/admindb')
+def admindb():
+    admins = Admin.query.all()
+    return render_template('admindb.html', admins=admins)
+
+@app.route('/patientdb')
+def patientdb():
+    patients = Patient.query.all()
+    return render_template('patientdb.html', patients=patients)
+
+@app.route('/docdb')
+def docdb():
+    doctors = Doctor.query.all()
+    return render_template('docdb.html', doctors=doctors)
+
 if __name__ == '__main__':
     adm()
     app.run(debug=True, port=5001)

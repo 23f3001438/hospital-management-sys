@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admins Assemble</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .header {
+            background-color: #8cbbed;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .search-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+        .search-bar input {
+            width: 70%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .search-bar button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .search-bar .search-btn {
+            background-color: #8ec0f6;
+            color: white;
+        }
+        .search-bar .create-btn {
+            background-color: #96f2ab;
+            color: white;
+        }
+        .section {
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+        .section h2 {
+            margin-bottom: 1rem;
+        }
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            background-color: white;
+        }
+        .list-item span {
+            flex: 1;
+        }
+        .list-item .actions button {
+            margin-left: 0.5rem;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .actions .edit-btn {
+            background-color: #fae094;
+            color: rgb(59, 58, 58);
+        }
+        .actions .delete-btn {
+            background-color: #f1909a;
+            color: white;
+        }
+        .actions .blacklist-btn {
+            background-color: #343a40;
+            color: white;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        .table th {
+            background-color: #8ebae9;
+            color: white;
+        }
+        .table .view-btn {
+            background-color: #a6d1ff;
+            color: white;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome Admin</h1>
+    </div>
+    <div class="search-bar">
+        <input type="text" placeholder="doctor, patient, department..">
+        <button class="search-btn">Search</button>
+        <button class="create-btn">Create</button>
+    </div>
+    <div class="section">
+        <h2>Registered Doctors</h2>
+        <div class="list-item">
+            <span>Dr. abcde</span>
+            <div class="actions">
+                <button class="edit-btn">Edit</button>
+                <button class="delete-btn">Delete</button>
+                <button class="blacklist-btn">Blacklist</button>
+            </div>
+        </div>
+        <div class="list-item">
+            <span>Dr. Pqrst</span>
+            <div class="actions">
+                <button class="edit-btn">Edit</button>
+                <button class="delete-btn">Delete</button>
+                <button class="blacklist-btn">Blacklist</button>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <h2>Registered Patients</h2>
+        <div class="list-item">
+            <span>Mr. abcde</span>
+            <div class="actions">
+                <button class="edit-btn">Edit</button>
+                <button class="delete-btn">Delete</button>
+                <button class="blacklist-btn">Blacklist</button>
+            </div>
+        </div>
+        <div class="list-item">
+            <span>Miss. Pqrst</span>
+            <div class="actions">
+                <button class="edit-btn">Edit</button>
+                <button class="delete-btn">Delete</button>
+                <button class="blacklist-btn">Blacklist</button>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <h2>Upcoming Appointments</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sr No.</th>
+                    <th>Patient Name</th>
+                    <th>Doctor Name</th>
+                    <th>Department</th>
+                    <th>Patient History</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1001</td>
+                    <td>Mr. abcde</td>
+                    <td>Dr. Pqrst</td>
+                    <td>Cardiology</td>
+                    <td><button class="view-btn">View</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
