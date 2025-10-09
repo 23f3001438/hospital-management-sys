@@ -1,5 +1,6 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, request, flash, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 from model import db, Patient, Doctor, Admin
 
 app = Flask(__name__)
@@ -27,6 +28,62 @@ def adm():
 @app.route('/')
 def home():
     return render_template('home.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        firstName = request.form.get('firstName')
+        lastName = request.form.get('lastName')
+        username = request.form.get('username')
+        dob = request.form.get('dob')
+        gender = request.form.get('gender')
+        contact = request.form.get('contact')
+        email = request.form.get('email')
+        address = request.form.get('address')
+        password = request.form.get('password')
+        
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+
+        existing_user = Patient.query.filter(
+            Patient.username == username | Patient.email == email | Patient.contact == contact
+        ).first()
+
+        if existing_user:
+            flash('User with this username, email, or contact already exists.', 'error')
+            return redirect('/register')
+        
+        new_patient = Patient(
+            name=f"{firstName} {lastName}",
+            username=username,
+            dob=dob,
+            gender=gender,
+            contact=contact,
+            email=email,
+            address=address,
+            password=hashed_password
+        )
+        db.session.add(new_patient)
+        db.session.commit()
+        flash('Registration successful!, Please log in.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = Patient.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            flash('Login successful!', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid username or password.', 'error')
+            return redirect('/login')
+
+    return render_template('login.html')
 
 if __name__ == '__main__':
     adm()
