@@ -15,12 +15,19 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-with app.app_context():
-    db.create_all()  
+def adm():
+    with app.app_context():
+        db.create_all()  # Create tables if they don't exist
+        admin = Admin.query.filter_by(username='archimangla1409').first()
+        if not admin:
+            admin = Admin(username='archimangla1409', contact=1234567890, password='archi123', name='Archi Mangla')
+            db.session.add(admin)
+            db.session.commit() 
 
 @app.route('/')
 def home():
     return render_template('home.html')
 
 if __name__ == '__main__':
+    adm()
     app.run(debug=True, port=5001)
