@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admins Assemble</title>
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -71,17 +69,20 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .actions .edit-btn {
+        .edit-btn {
             background-color: #fae094;
             color: rgb(59, 58, 58);
+            padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer;
         }
-        .actions .delete-btn {
+        .delete-btn {
             background-color: #f1909a;
             color: white;
+            padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer;
         }
-        .actions .blacklist-btn {
+        .blacklist-btn {
             background-color: #343a40;
             color: white;
+            padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer;
         }
         .table {
             width: 100%;
@@ -114,28 +115,46 @@
     <div class="search-bar">
         <input type="text" placeholder="doctor, patient, department..">
         <button class="search-btn">Search</button>
-        <button class="create-btn">Create</button>
+        <button onclick="location.href='/createdoc'">Create New Doctor</button>
     </div>
-    <div class="section">
+    
+    
+    <div>
         <h2>Registered Doctors</h2>
-        <div class="list-item">
-            <span>Dr. abcde</span>
-            <div class="actions">
-                <button class="edit-btn">Edit</button>
-                <button class="delete-btn">Delete</button>
-                <button class="blacklist-btn">Blacklist</button>
-            </div>
-        </div>
-        <div class="list-item">
-            <span>Dr. Pqrst</span>
-            <div class="actions">
-                <button class="edit-btn">Edit</button>
-                <button class="delete-btn">Delete</button>
-                <button class="blacklist-btn">Blacklist</button>
-            </div>
-        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Specialization</th>
+                    <th>Contact</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for doctor in doctors %}
+                <tr>
+                    <td>{{ doctor.id }}</td>  
+                    <td>{{ doctor.name }}</td>  
+                    <td>{{ doctor.username }}</td>
+                    <td>{{ doctor.specialization }}</td>
+                    <td>{{ doctor.contact }}</td>
+                    <td>{{ doctor.email }}</td>
+                    <td>
+                    <button class="edit-btn" onclick="location.href='/edit_doctor/{{ doctor.id }}'">Edit</button>
+                    <button class="delete-btn" onclick="location.href='/delete_doctor/{{ doctor.id }}'">Delete</button>
+                    <button class="blacklist-btn" onclick="location.href='/blacklist_doctor/{{ doctor.id }}'">Blacklist</button>
+                    </td>
+                </tr>
+                {% endfor %}
+    
+            </tbody>
+        </table>
     </div>
-    <div class="section">
+    {# <div class="section">
         <h2>Registered Patients</h2>
         <div class="list-item">
             <span>Mr. abcde</span>
@@ -153,7 +172,7 @@
                 <button class="blacklist-btn">Blacklist</button>
             </div>
         </div>
-    </div>
+    </div> #}
     <div class="section">
         <h2>Upcoming Appointments</h2>
         <table class="table">
@@ -177,5 +196,4 @@
             </tbody>
         </table>
     </div>
-</body>
-</html>
+{% endblock %}

@@ -49,7 +49,7 @@ def register():
         ).first()
 
         if existing_user:
-            flash('User with this username, email, or contact already exists.', 'error')
+            flash('User with this username, email, or contact already exists.', 'danger')
             return redirect('/register')
         
         new_patient = Patient(
@@ -83,22 +83,23 @@ def login():
         elif role == 'admin':
             user = Admin.query.filter_by(username=username).first()
         else:
-            flash('Invalid role selected.', 'error')
+            flash('Invalid role selected.', 'danger')
             return redirect('/login')
 
         if user and check_password_hash(user.password, password):
             flash(f'Login successful as {role}!', 'success')
             return redirect(url_for('home'))
         else:
-            flash('Invalid username or password.', 'error')
+            flash('Invalid username or password.', 'danger')
             return redirect('/login')
 
     return render_template('login.html')
 
 @app.route('/admindb')
 def admindb():
+    doctors = Doctor.query.all()
     admins = Admin.query.all()
-    return render_template('admindb.html', admins=admins)
+    return render_template('admindb.html', doctors=doctors, admins=admins)
 
 @app.route('/patientdb')
 def patientdb():
@@ -109,6 +110,44 @@ def patientdb():
 def docdb():
     doctors = Doctor.query.all()
     return render_template('docdb.html', doctors=doctors)
+
+@app.route('/createdoc', methods=['GET', 'POST'])
+def createdoc():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        username = request.form.get('username')
+        password = request.form.get('password')
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        specialization = request.form.get('specialization')
+        contact = request.form.get('contact')
+        email = request.form.get('email')
+
+        existing_user = Doctor.query.filter(
+        (Doctor.username == username) | 
+        (Doctor.contact == contact) | 
+        (Doctor.email == email)
+    ).first()
+
+        if existing_user:
+            flash('Doctor with this username or contact already exists.', 'danger')
+            return redirect('/createdoc')
+        
+        new_doctor = Doctor(
+            name=name,
+            username=username,
+            specialization=specialization,
+            password=hashed_password,
+            contact=contact,
+            email=email,
+            
+        )
+        db.session.add(new_doctor)
+        db.session.commit()
+        flash('Doctor created successfully!', 'success')
+        return redirect(url_for('docdb'))
+
+    return render_template('createdoc.html')
+
 
 if __name__ == '__main__':
     adm()

@@ -3,6 +3,7 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
+
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
@@ -18,6 +19,8 @@ class Patient(db.Model):
     role = db.Column(db.String(20), default='Patient', nullable=False)
     status = db.Column(db.String(20), default='Active', nullable=False)
     appointments = db.relationship('Appointment', backref='patient', lazy=True)
+    treatments = db.relationship('Treatment', backref='patient', lazy=True)
+    
 
 class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,7 +29,10 @@ class Doctor(db.Model):
     password = db.Column(db.String(255), nullable=False)
     specialization = db.Column(db.String(100), nullable=False)
     contact = db.Column(db.String(15))
+    email = db.Column(db.String(100), unique=True)
     appointments = db.relationship('Appointment', backref='doctor', lazy=True)
+    treatments = db.relationship('Treatment', backref='doctor', lazy=True)
+    
 
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,6 +48,14 @@ class MedicalRecord(db.Model):
     record_date = db.Column(db.Date, default=datetime.utcnow, nullable=False)
     description = db.Column(db.Text, nullable=False)
     treatment = db.Column(db.Text)
+
+class Treatment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
+    treatment_date = db.Column(db.Date, default=datetime.utcnow, nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    cost = db.Column(db.Float, nullable=False)
 
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
