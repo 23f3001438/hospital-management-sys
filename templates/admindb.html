@@ -144,6 +144,7 @@
                     <td>{{ doctor.contact }}</td>
                     <td>{{ doctor.email }}</td>
                     <td>
+                    <button class="view-btn">View</button>
                     <button class="edit-btn" onclick="location.href='/edit_doctor/{{ doctor.id }}'">Edit</button>
                     <button class="delete-btn" onclick="location.href='/delete_doctor/{{ doctor.id }}'">Delete</button>
                     <button class="blacklist-btn" onclick="location.href='/blacklist_doctor/{{ doctor.id }}'">Blacklist</button>
@@ -174,26 +175,72 @@
         </div>
     </div> #}
     <div class="section">
-        <h2>Upcoming Appointments</h2>
+        <h2>Present Patients</h2>
         <table class="table">
             <thead>
                 <tr>
-                    <th>Sr No.</th>
-                    <th>Patient Name</th>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
                     <th>Doctor Name</th>
-                    <th>Department</th>
-                    <th>Patient History</th>
+                    <th>DOB</th>
+                    <th>Gender</th>
+                    <th>Contact</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
+                    {% for patient in patients %}
                 <tr>
-                    <td>1001</td>
-                    <td>Mr. abcde</td>
-                    <td>Dr. Pqrst</td>
-                    <td>Cardiology</td>
-                    <td><button class="view-btn">View</button></td>
+                    <td>{{patient.id}}</td>
+                    <td>{{patient.first_name}}</td>
+                    <td>{{patient.last_name}}</td>
+                    <td>{{patient.doctor.name}}</td>
+                    <td>{{patient.dob}}</td>
+                    <td>{{patient.gender}}</td>
+                    <td>{{patient.contact}}</td>
+                    <td>{{patient.email}}</td>
+                    <td>{{patient.address}}</td>
+                    <td>
+                        <button class="view-btn">View</button>
+                        <button class="edit-btn" onclick="location.href='/edit_patient/{{ patient.id }}'">Edit</button>
+                        <button class="delete-btn" onclick="location.href='/delete_patient/{{ patient.id }}'">Delete</button>
+                        <button class="blacklist-btn" onclick="location.href='/blacklist_patient/{{ patient.id }}'">Blacklist</button>
+                    </td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
+
+    <div class="section">
+        <h2>Departments</h2>
+        <button onclick="location.href='/createdep'">Create New Department</button>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for department in departments %}
+                <tr>
+                    <td>{{ department.id }}</td>
+                    <td>{{ department.name }}</td>
+                    <td>
+                        <button class="view-btn">View</button>
+                        <button class="edit-btn" onclick="location.href='/editdep/{{ department.id }}'">Edit</button>
+                        <button class="delete-btn" onclick="location.href='/deletedep/{{ department.id }}'">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+            
 {% endblock %}

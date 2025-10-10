@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, redirect, request, flash, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
-from model import db, Patient, Doctor, Admin
+from model import db, Patient, Doctor, Admin, Department
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'archimangla'
@@ -10,7 +10,6 @@ app.config['SECRET_KEY'] = 'archimangla'
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(basedir, 'instance', 'hms_am.db')
 os.makedirs(os.path.dirname(db_path), exist_ok=True)  # create instance folder if it doesn't exist
-
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -99,7 +98,9 @@ def login():
 def admindb():
     doctors = Doctor.query.all()
     admins = Admin.query.all()
-    return render_template('admindb.html', doctors=doctors, admins=admins)
+    patients = Patient.query.all()
+    departments = Department.query.all()
+    return render_template('admindb.html', doctors=doctors, admins=admins, patients=patients, departments=departments)
 
 @app.route('/patientdb')
 def patientdb():
@@ -187,6 +188,86 @@ def delete_doctor(doctor_id):
     db.session.commit()
     flash('Doctor deleted successfully!', 'success')
     return redirect(url_for('admindb'))
+
+@app.route('/blacklist_doctor/<int:doctor_id>')
+def blacklist_doctor(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+    doctor.status = 'Blacklisted'
+    db.session.commit()
+    flash('Doctor blacklisted successfully!', 'success')
+    return redirect(url_for('admindb'))
+
+@app.route('/edit_patient/<int:patient_id>', methods=['GET', 'POST'])
+def edit_patient(patient_id):
+    patient = Patient.query.get_or_404(patient_id)
+    if request.method == 'POST':
+        patient.first_name = request.form.get('first_name')
+        patient.last_name = request.form.get('last_name')
+        patient.username = request.form.get('username')
+        patient.dob = request.form.get('dob')
+        patient.gender = request.form.get('gender')
+        patient.contact = request.form.get('contact')
+        patient.email = request.form.get('email')
+        patient.address = request.form.get('address')
+
+        db.session.commit()
+        flash('Patient details updated successfully!', 'success')
+        return redirect(url_for('admindb'))
+
+    return render_template('editpatient.html', patient=patient)
+
+@app.route('/delete_patient/<int:patient_id>')
+def delete_patient(patient_id):
+    patient = Patient.query.get_or_404(patient_id)
+    db.session.delete(patient)
+    db.session.commit()
+    flash('Patient deleted successfully!', 'success')
+    return redirect(url_for('admindb'))
+
+@app.route('/blacklist_patient/<int:patient_id>')
+def blacklist_patient(patient_id):  
+    patient = Patient.query.get_or_404(patient_id)
+    patient.status = 'Blacklisted'
+    db.session.commit()
+    flash('Patient blacklisted successfully!', 'success')
+    return redirect(url_for('admindb'))
+
+@app.route('/createdep', methods=['GET', 'POST'])
+def create_department():
+    if request.method == 'POST':
+        name = request.form.get('name')
+
+        existing_department = Department.query.filter_by(name=name).first()
+        if existing_department:
+            flash('Department with this name already exists.', 'danger')
+            return redirect('/createdep')
+
+        new_department = Department(name=name)
+        db.session.add(new_department)
+        db.session.commit()
+        flash('Department created successfully!', 'success')
+        return redirect(url_for('admindb'))
+
+    return render_template('createdep.html')
+
+@app.route('/editdep/<int:department_id>', methods=['GET', 'POST'])
+def edit_department(department_id):
+    department = Department.query.get_or_404(department_id)
+    if request.method == 'POST':
+        department.name = request.form.get('name')
+        db.session.commit()
+        flash('Department details updated successfully!', 'success')
+        return redirect(url_for('admindb'))
+    return render_template('editdep.html', department=department)
+
+@app.route('/deletedep/<int:department_id>')
+def delete_department(department_id):
+    department = Department.query.get_or_404(department_id)
+    db.session.delete(department)
+    db.session.commit()
+    flash('Department deleted successfully!', 'success')
+    return redirect(url_for('admindb'))
+
 if __name__ == '__main__':
     adm()
     app.run(debug=True, port=5001)
