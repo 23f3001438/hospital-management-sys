@@ -144,11 +144,49 @@ def createdoc():
         db.session.add(new_doctor)
         db.session.commit()
         flash('Doctor created successfully!', 'success')
-        return redirect(url_for('docdb'))
+        return redirect(url_for('admindb'))
 
     return render_template('createdoc.html')
 
+@app.route('/edit_doctor/<int:doctor_id>', methods=['GET', 'POST'])
+def edit_doctor(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+    if request.method == 'POST':
+        doctor.name = request.form.get('name')
+        doctor.username = request.form.get('username')
+        specialization = request.form.get('specialization')
+        contact = request.form.get('contact')
+        email = request.form.get('email')
 
+        existing_user = Doctor.query.filter(
+            ((Doctor.username == doctor.username) | 
+            (Doctor.contact == contact) | 
+            (Doctor.email == email)) & 
+            (Doctor.id != doctor.id)
+        ).first()
+
+        if existing_user:
+            flash('Another doctor with this username, email, or contact already exists.', 'danger')
+            return redirect(f'/edit_doctor/{doctor_id}')
+
+        doctor.specialization = specialization
+        doctor.contact = contact
+        doctor.email = email
+
+        db.session.commit()
+        flash('Doctor details updated successfully!', 'success')
+        return redirect(url_for('admindb'))
+
+    return render_template('editdoc.html', doctor=doctor)
+
+
+@app.route('/delete_doctor/<int:doctor_id>')
+def delete_doctor(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+    db.session.delete(doctor)
+    db.session.commit()
+    flash('Doctor deleted successfully!', 'success')
+    return redirect(url_for('admindb'))
 if __name__ == '__main__':
     adm()
     app.run(debug=True, port=5001)
