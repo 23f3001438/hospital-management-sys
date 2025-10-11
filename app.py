@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, redirect, request, flash, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from model import db, Patient, Doctor, Admin, Department
-
+from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'archimangla'
 
@@ -34,7 +34,8 @@ def register():
         firstName = request.form.get('firstName')
         lastName = request.form.get('lastName')
         username = request.form.get('username')
-        dob = request.form.get('dob')
+        dob_str = request.form['dob']  # '2025-09-30'
+        dob = datetime.strptime(dob_str, '%Y-%m-%d').date()
         gender = request.form.get('gender')
         contact = request.form.get('contact')
         email = request.form.get('email')
@@ -44,15 +45,20 @@ def register():
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
         existing_user = Patient.query.filter(
-            Patient.username == username | Patient.email == email | Patient.contact == contact
-        ).first()
+    (Patient.username == username) |
+    (Patient.email == email) |
+    (Patient.contact == contact)
+).first()
+
 
         if existing_user:
             flash('User with this username, email, or contact already exists.', 'danger')
             return redirect('/register')
         
+        
         new_patient = Patient(
-            name=f"{firstName} {lastName}",
+            first_name=firstName,
+            last_name=lastName,
             username=username,
             dob=dob,
             gender=gender,
@@ -267,6 +273,7 @@ def delete_department(department_id):
     db.session.commit()
     flash('Department deleted successfully!', 'success')
     return redirect(url_for('admindb'))
+
 
 if __name__ == '__main__':
     adm()
