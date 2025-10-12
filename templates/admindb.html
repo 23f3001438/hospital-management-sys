@@ -144,7 +144,7 @@
                     <td>{{ doctor.contact }}</td>
                     <td>{{ doctor.email }}</td>
                     <td>
-                    <button class="view-btn">View</button>
+                    <button class="view-btn" onclick="location.href='/view_doctor/{{ doctor.id }}'">View</button>
                     <button class="edit-btn" onclick="location.href='/edit_doctor/{{ doctor.id }}'">Edit</button>
                     <button class="delete-btn" onclick="location.href='/delete_doctor/{{ doctor.id }}'">Delete</button>
                     <button class="blacklist-btn" onclick="location.href='/blacklist_doctor/{{ doctor.id }}'">Blacklist</button>

@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, redirect, request, flash, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
-from model import db, Patient, Doctor, Admin, Department
+from model import db, Patient, Doctor, Admin, Department, Appointment, MedicalRecord, Treatment
 from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'archimangla'
@@ -34,7 +34,7 @@ def register():
         firstName = request.form.get('firstName')
         lastName = request.form.get('lastName')
         username = request.form.get('username')
-        dob_str = request.form['dob']  # '2025-09-30'
+        dob_str = request.form['dob'] 
         dob = datetime.strptime(dob_str, '%Y-%m-%d').date()
         gender = request.form.get('gender')
         contact = request.form.get('contact')
@@ -81,6 +81,7 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
+        # Identify user by role
         if role == 'patient':
             user = Patient.query.filter_by(username=username).first()
         elif role == 'doctor':
@@ -91,14 +92,24 @@ def login():
             flash('Invalid role selected.', 'danger')
             return redirect('/login')
 
+        # Validate password
         if user and check_password_hash(user.password, password):
             flash(f'Login successful as {role}!', 'success')
-            return redirect(url_for('home'))
+
+            # Redirect based on role
+            if role == 'patient':
+                return redirect(url_for('patientdb', patient_id=user.id))
+            elif role == 'doctor':
+                return redirect(url_for('docdb', doctor_id=user.id))
+            elif role == 'admin':
+                return redirect(url_for('admindb'))
         else:
             flash('Invalid username or password.', 'danger')
             return redirect('/login')
 
     return render_template('login.html')
+
+
 
 @app.route('/admindb')
 def admindb():
@@ -108,18 +119,30 @@ def admindb():
     departments = Department.query.all()
     return render_template('admindb.html', doctors=doctors, admins=admins, patients=patients, departments=departments)
 
-@app.route('/patientdb')
-def patientdb():
-    patients = Patient.query.all()
-    return render_template('patientdb.html', patients=patients)
+@app.route('/patient_dashboard/<int:patient_id>')
+def patient_dashboard(patient_id):
+    patient = Patient.query.get_or_404(patient_id)
+    departments = Department.query.all()
+    appointments = Appointment.query.filter_by(patient_id=patient_id).all()
+    return render_template(
+        'patientdb.html',
+        patient=patient,
+        departments=departments,
+        appointments=appointments
+    )
 
-@app.route('/docdb')
-def docdb():
-    doctors = Doctor.query.all()
-    return render_template('docdb.html', doctors=doctors)
+@app.route('/docdb/<int:doctor_id>')
+def docdb(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+    return render_template('docdb.html', doctor=doctor)
+
+
 
 @app.route('/createdoc', methods=['GET', 'POST'])
 def createdoc():
+    departments = Department.query.all()
+    print("Departments:", departments)  # just to verify data
+
     if request.method == 'POST':
         name = request.form.get('name')
         username = request.form.get('username')
@@ -130,13 +153,13 @@ def createdoc():
         email = request.form.get('email')
 
         existing_user = Doctor.query.filter(
-        (Doctor.username == username) | 
-        (Doctor.contact == contact) | 
-        (Doctor.email == email)
-    ).first()
+            (Doctor.username == username) | 
+            (Doctor.contact == contact) | 
+            (Doctor.email == email)
+        ).first()
 
         if existing_user:
-            flash('Doctor with this username or contact already exists.', 'danger')
+            flash('Doctor with this username, contact, or email already exists.', 'danger')
             return redirect('/createdoc')
         
         new_doctor = Doctor(
@@ -146,45 +169,61 @@ def createdoc():
             password=hashed_password,
             contact=contact,
             email=email,
-            
         )
         db.session.add(new_doctor)
         db.session.commit()
         flash('Doctor created successfully!', 'success')
         return redirect(url_for('admindb'))
 
-    return render_template('createdoc.html')
+    # Pass departments to template for the dropdown
+    return render_template('createdoc.html', departments=departments)
+
 
 @app.route('/edit_doctor/<int:doctor_id>', methods=['GET', 'POST'])
 def edit_doctor(doctor_id):
     doctor = Doctor.query.get_or_404(doctor_id)
+    departments = Department.query.all()  # fetch all departments
+    print("Departments:", departments) 
+
     if request.method == 'POST':
         doctor.name = request.form.get('name')
         doctor.username = request.form.get('username')
-        specialization = request.form.get('specialization')
-        contact = request.form.get('contact')
-        email = request.form.get('email')
+        doctor.specialization = request.form.get('specialization')
+        doctor.contact = request.form.get('contact')
+        doctor.email = request.form.get('email')
 
         existing_user = Doctor.query.filter(
             ((Doctor.username == doctor.username) | 
-            (Doctor.contact == contact) | 
-            (Doctor.email == email)) & 
+             (Doctor.contact == doctor.contact) | 
+             (Doctor.email == doctor.email)) &
             (Doctor.id != doctor.id)
         ).first()
 
         if existing_user:
             flash('Another doctor with this username, email, or contact already exists.', 'danger')
-            return redirect(f'/edit_doctor/{doctor_id}')
-
-        doctor.specialization = specialization
-        doctor.contact = contact
-        doctor.email = email
+            return redirect(url_for('edit_doctor', doctor_id=doctor.id))
 
         db.session.commit()
         flash('Doctor details updated successfully!', 'success')
         return redirect(url_for('admindb'))
 
-    return render_template('editdoc.html', doctor=doctor)
+    return render_template('editdoc.html', doctor=doctor, departments=departments)
+
+@app.route('/view_doctor/<int:doctor_id>')
+def view_doctor(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+
+    upcoming_appointments = Appointment.query.filter_by(doctor_id=doctor.id, status='Scheduled').all()
+    assigned_patients = Patient.query.join(Appointment).filter(Appointment.doctor_id == doctor.id).all()
+
+    return render_template(
+        'docprofile.html',
+        doctor=doctor,
+        appointments=upcoming_appointments,
+        assigned_patients=assigned_patients
+    )
+
+
 
 
 @app.route('/delete_doctor/<int:doctor_id>')
@@ -202,6 +241,50 @@ def blacklist_doctor(doctor_id):
     db.session.commit()
     flash('Doctor blacklisted successfully!', 'success')
     return redirect(url_for('admindb'))
+
+@app.route('/mark_complete/<int:appointment_id>')
+def mark_complete(appointment_id):
+    appointment = Appointment.query.get_or_404(appointment_id)
+    appointment.status = 'Completed'
+    db.session.commit()
+    flash('Appointment marked as complete.', 'success')
+    return redirect(request.referrer or url_for('view_doctor', doctor_id=appointment.doctor_id))
+
+@app.route('/cancel_appointment/<int:appointment_id>', methods=['POST', 'GET'])
+def cancel_appointment(appointment_id):
+    appointment = Appointment.query.get_or_404(appointment_id)
+    if request.method == 'POST':
+        appointment.status = 'Cancelled'
+        db.session.commit()
+        flash('Appointment cancelled.', 'success')
+        return redirect(request.referrer or url_for('view_doctor', doctor_id=appointment.doctor_id))
+    return render_template('confirm_cancel.html', appointment=appointment)
+
+@app.route('/view_patient_profile/<int:patient_id>')
+def view_patient_profile(patient_id):
+    patient = Patient.query.get_or_404(patient_id)
+    # Render a template showing full patient profile
+    return render_template('patient_profile.html', patient=patient)
+
+
+@app.route('/logout')
+def logout():
+    # Logic for logging out the user
+    flash('You have been logged out.', 'success')
+    return redirect('/')
+
+@app.route('/patientdb/<int:patient_id>')
+def patientdb(patient_id):
+    patient = Patient.query.get_or_404(patient_id)
+    departments = Department.query.all()
+    appointments = Appointment.query.filter_by(patient_id=patient_id).all()
+    return render_template(
+        'patientdb.html',
+        patient=patient,
+        departments=departments,
+        appointments=appointments
+    )
+
 
 @app.route('/edit_patient/<int:patient_id>', methods=['GET', 'POST'])
 def edit_patient(patient_id):
@@ -237,6 +320,12 @@ def blacklist_patient(patient_id):
     db.session.commit()
     flash('Patient blacklisted successfully!', 'success')
     return redirect(url_for('admindb'))
+
+@app.route('/view_department/<int:dept_id>')
+def view_department(dept_id):
+    department = Department.query.get_or_404(dept_id)
+    doctors = Doctor.query.filter_by(specialization=department.name).all()
+    return render_template('view_department.html', department=department, doctors=doctors)
 
 @app.route('/createdep', methods=['GET', 'POST'])
 def create_department():

@@ -16,8 +16,14 @@
         <br><br>
 
         <label for="specialization">Specialization:</label>
-        <input type="text" id="specialization" name="specialization" required>
+        <select id="specialization" name="specialization" required>
+            <option value="">--Select Specialization--</option>
+            {% for dept in departments %}
+                <option value="{{ dept.name }}">{{ dept.name }}</option>
+            {% endfor %}
+        </select>
         <br><br>
+
 
         <label for="contact">Contact Number:</label>
         <input type="tel" id="contact" name="contact" required>
@@ -28,6 +34,7 @@
         <br><br>
 
         
+
         <button type="submit">Create Profile</button>
     </form>
 {%endblock%}

@@ -33,6 +33,7 @@ class Doctor(db.Model):
     specialization = db.Column(db.String(100), nullable=False)
     contact = db.Column(db.String(15))
     email = db.Column(db.String(100), unique=True)
+    status = db.Column(db.String(20), default='Active', server_default='Active', nullable=False)
     appointments = db.relationship('Appointment', backref='doctor', lazy=True)
     treatments = db.relationship('Treatment', backref='doctor', lazy=True)
 

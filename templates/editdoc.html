@@ -1,9 +1,9 @@
-{%extends 'base.html '%}
+{%extends 'base.html'%}
 {%block title%}Edit Doctor{%endblock%}
 
 {%block content%}
     <h2>Edit Doctor Profile</h2>
-    <form action="/editdoc/{{ doctor.id }}" method="POST">
+    <form action="{{ url_for('edit_doctor', doctor_id=doctor.id) }}" method="POST">
         <label for="name">Full Name:</label>
         <input type="text" id="name" name="name" value="{{ doctor.name }}" required>
 
@@ -15,9 +15,17 @@
         <input type="password" id="password" name="password" value="{{ doctor.password }}" required>
         <br><br>
 
-        <label for="specialization">Specialization:</label>
-        <input type="text" id="specialization" name="specialization" value="{{ doctor.specialization }}" required>
+       <label for="specialization">Specialization:</label>
+        <select id="specialization" name="specialization" required>
+            <option value="">--Select Specialization--</option>
+            {% for dept in departments %}
+                <option value="{{ dept.name }}" {% if dept.name == doctor.specialization %}selected{% endif %}>
+                    {{ dept.name }}
+                </option>
+            {% endfor %}
+        </select>
         <br><br>
+
 
         <label for="contact">Contact Number:</label>
         <input type="tel" id="contact" name="contact" value="{{ doctor.contact }}" required>
