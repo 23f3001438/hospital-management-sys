@@ -96,8 +96,18 @@ def login():
             flash('Invalid role selected.', 'danger')
             return redirect('/login')
 
+        # Check if user exists
+        if not user:
+            flash('Invalid username or password.', 'danger')
+            return redirect('/login')
+
+        # Check if user is blacklisted
+        if role in ['patient', 'doctor'] and getattr(user, 'status', '').lower() == 'blacklisted':
+            flash('Login prohibited: You are blacklisted by admin.', 'danger')
+            return redirect('/login')
+
         # Validate password
-        if user and check_password_hash(user.password, password):
+        if check_password_hash(user.password, password):
             flash(f'Login successful as {role}!', 'success')
 
             # Redirect based on role
@@ -113,6 +123,8 @@ def login():
             return redirect('/login')
 
     return render_template('login.html')
+
+
 
 
 
