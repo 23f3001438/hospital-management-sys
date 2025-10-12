@@ -2,6 +2,14 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
+{% macro highlight(text, query) %}
+    {% if query %}
+        {{ text|replace(query, '<mark>'+query+'</mark>')|safe }}
+    {% else %}
+        {{ text }}
+    {% endif %}
+{% endmacro %}
+
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -39,7 +47,7 @@
         color: white;
     }
     .search-bar .create-btn {
-        background-color: #96f2ab;
+        background-color: #6260f8;
         color: white;
     }
     .section {
@@ -115,15 +123,37 @@
 </div>
 
 <div class="search-bar">
-    <form method="GET" action="/search">
-        <input type="text" name="query" placeholder="doctor, patient, department..">
-        <button class="search-btn">Search</button>
+    <form method="GET" action="{{ url_for('admindb') }}" style="display: flex; width: 100%; gap: 0.5rem;">
+        <input type="text" name="query" placeholder="Search..." value="{{ request.args.get('query', '') }}" style="flex:1; padding:0.5rem; border-radius:5px; border:1px solid #ddd;">
+        <select name="category" style="padding:0.5rem; border-radius:5px; border:1px solid #ddd;">
+            <option value="all" {% if request.args.get('category') == 'all' %}selected{% endif %}>All</option>
+            <option value="doctor" {% if request.args.get('category') == 'doctor' %}selected{% endif %}>Doctors</option>
+            <option value="patient" {% if request.args.get('category') == 'patient' %}selected{% endif %}>Patients</option>
+        </select>
+        <button type="submit" class="search-btn">Search</button>
+        <a href="{{ url_for('admindb') }}" style="background-color: #a6d1ff;
+        color: white;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;">Clear</a>
     </form>
-    <a class="create-btn" href="{{ url_for('createdoc') }}">Create New Doctor</a>
+    
 </div>
+
 
 <div class="section">
     <h2>Registered Doctors</h2>
+    <a style="background-color: #a6d1ff;
+        color: white;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;" href="{{ url_for('createdoc') }}">Create New Doctor</a>
     <table class="table">
         <thead>
             <tr>
@@ -140,11 +170,12 @@
             {% for doctor in doctors %}
             <tr>
                 <td>{{ doctor.id }}</td>
-                <td>{{ doctor.name }}</td>
-                <td>{{ doctor.username }}</td>
+                <td>{{ highlight(doctor.name, search_query) }}</td>
+                <td>{{ highlight(doctor.username, search_query) }}</td>
                 <td>{{ doctor.specialization }}</td>
-                <td>{{ doctor.contact }}</td>
-                <td>{{ doctor.email }}</td>
+                <td>{{ highlight(doctor.email, search_query) }}</td>
+                <td>{{ highlight(doctor.contact, search_query) }}</td>
+
                 <td>
                     <a class="view-btn" href="{{ url_for('view_doctor', doctor_id=doctor.id) }}">View</a>
                     <a class="edit-btn" href="{{ url_for('edit_doctor', doctor_id=doctor.id) }}">Edit</a>
@@ -154,9 +185,9 @@
                     {% else %}
                         <a class="blacklist-btn" href="{{ url_for('blacklist_doctor', doctor_id=doctor.id) }}">Blacklist</a>
                     {% endif %}
-
-
                 </td>
+                
+
             </tr>
             {% endfor %}
         </tbody>
@@ -182,13 +213,12 @@
         <tbody>
             {% for patient in patients %}
             <tr>
-                <td>{{ patient.id }}</td>
-                <td>{{ patient.first_name }}</td>
-                <td>{{ patient.last_name }}</td>
+                <td>{{ highlight(patient.first_name, search_query) }}</td>
+                <td>{{ highlight(patient.last_name, search_query) }}</td>
                 <td>{{ patient.dob }}</td>
                 <td>{{ patient.gender }}</td>
-                <td>{{ patient.contact }}</td>
-                <td>{{ patient.email }}</td>
+                <td>{{ highlight(patient.contact, search_query) }}</td>
+                <td>{{ highlight(patient.email, search_query) }}</td>
                 <td>{{ patient.address }}</td>
                 <td>
                     <a class="view-btn" href="{{ url_for('view_patient_profile', patient_id=patient.id) }}">View</a>
@@ -202,6 +232,7 @@
                     {% endif %}
 
                 </td>
+                
 
             </tr>
             {% endfor %}
@@ -211,7 +242,14 @@
 
 <div class="section">
     <h2>Departments</h2>
-    <a style="padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer;" href="{{ url_for('create_department') }}">Create New Department</a>
+    <a style="background-color: #a6d1ff;
+        color: white;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;" href="{{ url_for('create_department') }}">Create New Department</a>
     <table class="table">
         <thead>
             <tr>
@@ -223,13 +261,15 @@
         <tbody>
             {% for department in departments %}
             <tr>
-                <td>{{ department.id }}</td>
-                <td>{{ department.name }}</td>
+                <td>{{ highlight(department.name, search_query) }}</td>
+                <td>{{ highlight(department.description, search_query) }}</td>
                 <td>
                     <a class="view-btn" href="{{ url_for('view_department', dept_id=department.id) }}">View</a>
                     <a class="edit-btn" href="{{ url_for('edit_department', department_id=department.id) }}">Edit</a>
                     <a class="delete-btn" href="{{ url_for('delete_department', department_id=department.id) }}">Delete</a>
                 </td>
+                
+
             </tr>
             {% endfor %}
         </tbody>

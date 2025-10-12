@@ -118,11 +118,71 @@ def login():
 
 @app.route('/admindb')
 def admindb():
-    doctors = Doctor.query.all()
+    query = request.args.get('query', '').strip()
+    category = request.args.get('category', 'all')
+
+    doctors = Doctor.query
+    patients = Patient.query
+    departments = Department.query
     admins = Admin.query.all()
-    patients = Patient.query.all()
-    departments = Department.query.all()
-    return render_template('admindb.html', doctors=doctors, admins=admins, patients=patients, departments=departments)
+
+    if query:
+        q = f"%{query}%"
+        if category == 'doctor':
+            doctors = doctors.filter(
+                (Doctor.name.ilike(q)) |
+                (Doctor.username.ilike(q)) |
+                (Doctor.email.ilike(q))
+            ).all()
+            patients = []
+            departments = []
+        elif category == 'patient':
+            patients = patients.filter(
+                (Patient.first_name.ilike(q)) |
+                (Patient.last_name.ilike(q)) |
+                (Patient.username.ilike(q)) |
+                (Patient.email.ilike(q))
+            ).all()
+            doctors = []
+            departments = []
+        elif category == 'department':
+            departments = departments.filter(
+                (Department.name.ilike(q)) |
+                (Department.description.ilike(q))
+            ).all()
+            doctors = []
+            patients = []
+        else:  # all
+            doctors = doctors.filter(
+                (Doctor.name.ilike(q)) |
+                (Doctor.username.ilike(q)) |
+                (Doctor.email.ilike(q))
+            ).all()
+            patients = patients.filter(
+                (Patient.first_name.ilike(q)) |
+                (Patient.last_name.ilike(q)) |
+                (Patient.username.ilike(q)) |
+                (Patient.email.ilike(q))
+            ).all()
+            departments = departments.filter(
+                (Department.name.ilike(q)) |
+                (Department.description.ilike(q))
+            ).all()
+    else:
+        doctors = doctors.all()
+        patients = patients.all()
+        departments = departments.all()
+
+    return render_template(
+        'admindb.html',
+        doctors=doctors,
+        admins=admins,
+        patients=patients,
+        departments=departments,
+        search_query=query
+    )
+
+
 
 @app.route('/patient_dashboard/<int:patient_id>')
 def patient_dashboard(patient_id):
