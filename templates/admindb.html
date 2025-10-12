@@ -2,248 +2,238 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-        .header {
-            background-color: #8cbbed;
-            color: white;
-            padding: 1rem;
-            text-align: center;
-        }
-        .search-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 1rem auto;
-            padding: 0 1rem;
-        }
-        .search-bar input {
-            width: 70%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .search-bar button {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .search-bar .search-btn {
-            background-color: #8ec0f6;
-            color: white;
-        }
-        .search-bar .create-btn {
-            background-color: #96f2ab;
-            color: white;
-        }
-        .section {
-            margin: 1rem auto;
-            padding: 0 1rem;
-        }
-        .section h2 {
-            margin-bottom: 1rem;
-        }
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 0.5rem;
-            background-color: white;
-        }
-        .list-item span {
-            flex: 1;
-        }
-        .list-item .actions button {
-            margin-left: 0.5rem;
-            padding: 0.5rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .edit-btn {
-            background-color: #fae094;
-            color: rgb(59, 58, 58);
-            padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer;
-        }
-        .delete-btn {
-            background-color: #f1909a;
-            color: white;
-            padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer;
-        }
-        .blacklist-btn {
-            background-color: #343a40;
-            color: white;
-            padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        .table th, .table td {
-            border: 1px solid #ddd;
-            padding: 0.5rem;
-            text-align: left;
-        }
-        .table th {
-            background-color: #8ebae9;
-            color: white;
-        }
-        .table .view-btn {
-            background-color: #a6d1ff;
-            color: white;
-            padding: 0.5rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>Welcome Admin</h1>
-    </div>
-    <div class="search-bar">
-        <input type="text" placeholder="doctor, patient, department..">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+    }
+    .header {
+        background-color: #8cbbed;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+    }
+    .search-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1rem auto;
+        padding: 0 1rem;
+    }
+    .search-bar input {
+        width: 70%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    .search-bar button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .search-bar .search-btn {
+        background-color: #8ec0f6;
+        color: white;
+    }
+    .search-bar .create-btn {
+        background-color: #96f2ab;
+        color: white;
+    }
+    .section {
+        margin: 1rem auto;
+        padding: 0 1rem;
+    }
+    .section h2 {
+        margin-bottom: 1rem;
+    }
+    .list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 0.5rem;
+        background-color: white;
+    }
+    .list-item span {
+        flex: 1;
+    }
+    .list-item .actions button {
+        margin-left: 0.5rem;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .edit-btn {
+        background-color: #fae094;
+        color: rgb(59, 58, 58);
+        padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer;
+    }
+    .delete-btn {
+        background-color: #f1909a;
+        color: white;
+        padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer;
+    }
+    .blacklist-btn {
+        background-color: #343a40;
+        color: white;
+        padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer;
+    }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    .table th, .table td {
+        border: 1px solid #ddd;
+        padding: 0.5rem;
+        text-align: left;
+    }
+    .table th {
+        background-color: #8ebae9;
+        color: white;
+    }
+    .table .view-btn {
+        background-color: #a6d1ff;
+        color: white;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+</style>
+
+<div class="header">
+    <h1>Welcome Admin</h1>
+</div>
+
+<div class="search-bar">
+    <form method="GET" action="/search">
+        <input type="text" name="query" placeholder="doctor, patient, department..">
         <button class="search-btn">Search</button>
-        <button onclick="location.href='/createdoc'">Create New Doctor</button>
-    </div>
-    
-    
-    <div>
-        <h2>Registered Doctors</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Specialization</th>
-                    <th>Contact</th>
-                    <th>Email</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+    </form>
+    <a class="create-btn" href="{{ url_for('createdoc') }}">Create New Doctor</a>
+</div>
 
-            <tbody>
-                {% for doctor in doctors %}
-                <tr>
-                    <td>{{ doctor.id }}</td>  
-                    <td>{{ doctor.name }}</td>  
-                    <td>{{ doctor.username }}</td>
-                    <td>{{ doctor.specialization }}</td>
-                    <td>{{ doctor.contact }}</td>
-                    <td>{{ doctor.email }}</td>
-                    <td>
-                    <button class="view-btn" onclick="location.href='/view_doctor/{{ doctor.id }}'">View</button>
-                    <button class="edit-btn" onclick="location.href='/edit_doctor/{{ doctor.id }}'">Edit</button>
-                    <button class="delete-btn" onclick="location.href='/delete_doctor/{{ doctor.id }}'">Delete</button>
-                    <button class="blacklist-btn" onclick="location.href='/blacklist_doctor/{{ doctor.id }}'">Blacklist</button>
-                    </td>
-                </tr>
-                {% endfor %}
-    
-            </tbody>
-        </table>
-    </div>
-    {# <div class="section">
-        <h2>Registered Patients</h2>
-        <div class="list-item">
-            <span>Mr. abcde</span>
-            <div class="actions">
-                <button class="edit-btn">Edit</button>
-                <button class="delete-btn">Delete</button>
-                <button class="blacklist-btn">Blacklist</button>
-            </div>
-        </div>
-        <div class="list-item">
-            <span>Miss. Pqrst</span>
-            <div class="actions">
-                <button class="edit-btn">Edit</button>
-                <button class="delete-btn">Delete</button>
-                <button class="blacklist-btn">Blacklist</button>
-            </div>
-        </div>
-    </div> #}
-    <div class="section">
-        <h2>Present Patients</h2>
-        
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Doctor Name</th>
-                    <th>DOB</th>
-                    <th>Gender</th>
-                    <th>Contact</th>
-                    <th>Email</th>
-                    <th>Address</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                    {% for patient in patients %}
-                <tr>
-                    <td>{{patient.id}}</td>
-                    <td>{{patient.first_name}}</td>
-                    <td>{{patient.last_name}}</td>
-                    <td>{{patient.dob}}</td>
-                    <td>{{patient.gender}}</td>
-                    <td>{{patient.contact}}</td>
-                    <td>{{patient.email}}</td>
-                    <td>{{patient.address}}</td>
-                    <td>
-                        <button class="view-btn">View</button>
-                        <button class="edit-btn" onclick="location.href='/edit_patient/{{ patient.id }}'">Edit</button>
-                        <button class="delete-btn" onclick="location.href='/delete_patient/{{ patient.id }}'">Delete</button>
-                        <button class="blacklist-btn" onclick="location.href='/blacklist_patient/{{ patient.id }}'">Blacklist</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<div class="section">
+    <h2>Registered Doctors</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Specialization</th>
+                <th>Contact</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doctor in doctors %}
+            <tr>
+                <td>{{ doctor.id }}</td>
+                <td>{{ doctor.name }}</td>
+                <td>{{ doctor.username }}</td>
+                <td>{{ doctor.specialization }}</td>
+                <td>{{ doctor.contact }}</td>
+                <td>{{ doctor.email }}</td>
+                <td>
+                    <a class="view-btn" href="{{ url_for('view_doctor', doctor_id=doctor.id) }}">View</a>
+                    <a class="edit-btn" href="{{ url_for('edit_doctor', doctor_id=doctor.id) }}">Edit</a>
+                    <a class="delete-btn" href="{{ url_for('delete_doctor', doctor_id=doctor.id) }}">Delete</a>
+                    {% if doctor.status == 'Blacklisted' %}
+                        <a class="blacklist-btn" href="{{ url_for('unblacklist_doctor', doctor_id=doctor.id) }}">Unblock</a>
+                    {% else %}
+                        <a class="blacklist-btn" href="{{ url_for('blacklist_doctor', doctor_id=doctor.id) }}">Blacklist</a>
+                    {% endif %}
 
-    <div class="section">
-        <h2>Departments</h2>
-        <button style="padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer; align-items: right;" onclick="location.href='/createdep'">Create New Department</button>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for department in departments %}
-                <tr>
-                    <td>{{ department.id }}</td>
-                    <td>{{ department.name }}</td>
-                    <td>
-                        <button class="view-btn">View</button>
-                        <button class="edit-btn" onclick="location.href='/editdep/{{ department.id }}'">Edit</button>
-                        <button class="delete-btn" onclick="location.href='/deletedep/{{ department.id }}'">Delete</button>
-                    </td>
-                </tr>
-                {% endfor %}
 
-            </tbody>
-        </table>
-    </div>
-            
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="section">
+    <h2>Present Patients</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>DOB</th>
+                <th>Gender</th>
+                <th>Contact</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for patient in patients %}
+            <tr>
+                <td>{{ patient.id }}</td>
+                <td>{{ patient.first_name }}</td>
+                <td>{{ patient.last_name }}</td>
+                <td>{{ patient.dob }}</td>
+                <td>{{ patient.gender }}</td>
+                <td>{{ patient.contact }}</td>
+                <td>{{ patient.email }}</td>
+                <td>{{ patient.address }}</td>
+                <td>
+                    <a class="view-btn" href="{{ url_for('view_patient_profile', patient_id=patient.id) }}">View</a>
+                    <a class="edit-btn" href="{{ url_for('edit_patient', patient_id=patient.id) }}">Edit</a>
+                    <a class="delete-btn" href="{{ url_for('delete_patient', patient_id=patient.id) }}">Delete</a>
+                    
+                    {% if patient.status == 'Blacklisted' %}
+                        <a class="blacklist-btn" href="{{ url_for('unblacklist_patient', patient_id=patient.id) }}">Unblock</a>
+                    {% else %}
+                        <a class="blacklist-btn" href="{{ url_for('blacklist_patient', patient_id=patient.id) }}">Blacklist</a>
+                    {% endif %}
+
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="section">
+    <h2>Departments</h2>
+    <a style="padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer;" href="{{ url_for('create_department') }}">Create New Department</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for department in departments %}
+            <tr>
+                <td>{{ department.id }}</td>
+                <td>{{ department.name }}</td>
+                <td>
+                    <a class="view-btn" href="{{ url_for('view_department', dept_id=department.id) }}">View</a>
+                    <a class="edit-btn" href="{{ url_for('edit_department', department_id=department.id) }}">Edit</a>
+                    <a class="delete-btn" href="{{ url_for('delete_department', department_id=department.id) }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}

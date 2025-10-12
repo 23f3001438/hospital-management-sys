@@ -3,10 +3,14 @@
 
 {%block content%}
     <h2>Create Department</h2>
-    <form action="/createdep" method="POST">
+    <form method="POST">
         <label for="name">Department Name:</label>
-        <input type="text" id="name" name="name" required>
-        <br><br>
+        <input type="text" name="name" id="name" required>
+
+        <label for="description">Description:</label>
+        <textarea name="description" id="description" rows="3" required></textarea>
+
         <button type="submit">Create Department</button>
     </form>
+
 {%endblock%}

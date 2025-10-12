@@ -15,14 +15,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
+from werkzeug.security import generate_password_hash
+
 def adm():
     with app.app_context():
         db.create_all()  # Create tables if they don't exist
         admin = Admin.query.filter_by(username='archimangla1409').first()
         if not admin:
-            admin = Admin(username='archimangla1409', contact=1234567890, password='archi123', name='Archi Mangla')
+            hashed_pw = generate_password_hash('archi123', method='pbkdf2:sha256')
+            admin = Admin(username='archimangla1409', contact=1234567890, password=hashed_pw, name='Archi Mangla')
             db.session.add(admin)
-            db.session.commit() 
+            db.session.commit()
+
 
 @app.route('/')
 def home():
@@ -103,6 +107,7 @@ def login():
                 return redirect(url_for('docdb', doctor_id=user.id))
             elif role == 'admin':
                 return redirect(url_for('admindb'))
+
         else:
             flash('Invalid username or password.', 'danger')
             return redirect('/login')
@@ -224,8 +229,6 @@ def view_doctor(doctor_id):
     )
 
 
-
-
 @app.route('/delete_doctor/<int:doctor_id>')
 def delete_doctor(doctor_id):
     doctor = Doctor.query.get_or_404(doctor_id)
@@ -234,13 +237,7 @@ def delete_doctor(doctor_id):
     flash('Doctor deleted successfully!', 'success')
     return redirect(url_for('admindb'))
 
-@app.route('/blacklist_doctor/<int:doctor_id>')
-def blacklist_doctor(doctor_id):
-    doctor = Doctor.query.get_or_404(doctor_id)
-    doctor.status = 'Blacklisted'
-    db.session.commit()
-    flash('Doctor blacklisted successfully!', 'success')
-    return redirect(url_for('admindb'))
+
 
 @app.route('/mark_complete/<int:appointment_id>')
 def mark_complete(appointment_id):
@@ -293,7 +290,8 @@ def edit_patient(patient_id):
         patient.first_name = request.form.get('first_name')
         patient.last_name = request.form.get('last_name')
         patient.username = request.form.get('username')
-        patient.dob = request.form.get('dob')
+        dob_str = request.form.get('dob')
+        patient.dob = datetime.strptime(dob_str, '%Y-%m-%d').date()
         patient.gender = request.form.get('gender')
         patient.contact = request.form.get('contact')
         patient.email = request.form.get('email')
@@ -301,9 +299,9 @@ def edit_patient(patient_id):
 
         db.session.commit()
         flash('Patient details updated successfully!', 'success')
-        return redirect(url_for('admindb'))
+        return redirect(url_for('view_patient_profile', patient_id=patient.id))
 
-    return render_template('editpatient.html', patient=patient)
+    return render_template('editp.html', patient=patient)
 
 @app.route('/delete_patient/<int:patient_id>')
 def delete_patient(patient_id):
@@ -313,31 +311,73 @@ def delete_patient(patient_id):
     flash('Patient deleted successfully!', 'success')
     return redirect(url_for('admindb'))
 
-@app.route('/blacklist_patient/<int:patient_id>')
-def blacklist_patient(patient_id):  
-    patient = Patient.query.get_or_404(patient_id)
-    patient.status = 'Blacklisted'
-    db.session.commit()
-    flash('Patient blacklisted successfully!', 'success')
-    return redirect(url_for('admindb'))
+
 
 @app.route('/view_department/<int:dept_id>')
 def view_department(dept_id):
+    # Get the department
     department = Department.query.get_or_404(dept_id)
+    
+    # Get doctors in this department
     doctors = Doctor.query.filter_by(specialization=department.name).all()
-    return render_template('view_department.html', department=department, doctors=doctors)
+    
+    # Precompute upcoming appointment count for each doctor
+    for doctor in doctors:
+        doctor.num_appointments = Appointment.query.filter_by(doctor_id=doctor.id, status='Scheduled').count()
+    
+    # Render template
+    return render_template(
+        'viewdep.html',
+        department=department,
+        doctors=doctors
+    )
+
+@app.route('/blacklist_doctor/<int:doctor_id>')
+def blacklist_doctor(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+    doctor.status = 'Blacklisted'
+    db.session.commit()
+    flash(f"Doctor {doctor.name} has been blacklisted.", "success")
+    return redirect(url_for('admindb'))
+
+@app.route('/unblacklist_doctor/<int:doctor_id>')
+def unblacklist_doctor(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+    doctor.status = 'Active'
+    db.session.commit()
+    flash(f"Doctor {doctor.name} has been unblocked.", "success")
+    return redirect(url_for('admindb'))
+
+
+
+@app.route('/blacklist_patient/<int:patient_id>')
+def blacklist_patient(patient_id):
+    patient = Patient.query.get_or_404(patient_id)
+    patient.status = 'Blacklisted'
+    db.session.commit()
+    return redirect(url_for('admindb'))
+
+@app.route('/unblacklist_patient/<int:patient_id>')
+def unblacklist_patient(patient_id):
+    patient = Patient.query.get_or_404(patient_id)
+    patient.status = 'Active'
+    db.session.commit()
+    return redirect(url_for('admindb'))
+
+
 
 @app.route('/createdep', methods=['GET', 'POST'])
 def create_department():
     if request.method == 'POST':
         name = request.form.get('name')
+        description = request.form.get('description')  # get description from form
 
         existing_department = Department.query.filter_by(name=name).first()
         if existing_department:
             flash('Department with this name already exists.', 'danger')
             return redirect('/createdep')
 
-        new_department = Department(name=name)
+        new_department = Department(name=name, description=description)  # save description
         db.session.add(new_department)
         db.session.commit()
         flash('Department created successfully!', 'success')
@@ -345,15 +385,18 @@ def create_department():
 
     return render_template('createdep.html')
 
+
 @app.route('/editdep/<int:department_id>', methods=['GET', 'POST'])
 def edit_department(department_id):
     department = Department.query.get_or_404(department_id)
     if request.method == 'POST':
         department.name = request.form.get('name')
+        department.description = request.form.get('description')  # <-- add this
         db.session.commit()
         flash('Department details updated successfully!', 'success')
         return redirect(url_for('admindb'))
     return render_template('editdep.html', department=department)
+
 
 @app.route('/deletedep/<int:department_id>')
 def delete_department(department_id):
