@@ -607,6 +607,17 @@ def book_appointment(doctor_id):
         ]
         available_times = [slot for slot in all_slots if slot not in booked_slots]
 
+        existing_appointment = Appointment.query.filter_by(
+            doctor_id=doctor_id,
+            date=appointment_date,
+            time=appointment_time,
+            status='Booked'
+        ).first()
+
+        if existing_appointment:
+            flash("This time slot is already booked for the doctor.", "danger")
+    
+
         # If patient submits the form with date and time
         if request.form.get('time'):
             appointment_time = request.form['time']
@@ -662,6 +673,17 @@ def reschedule_appointment(appointment_id):
         if not avail_entry:
             flash("Doctor is not available on this date.", "danger")
             return redirect(url_for('reschedule_appointment', appointment_id=appointment.id))
+        
+        existing_appointment = Appointment.query.filter_by(
+            doctor_id=doctor_id,
+            date=appointment_date,
+            time=appointment_time,
+            status='Booked'
+        ).first()
+
+        if existing_appointment:
+            flash("This time slot is already booked for the doctor.", "danger")
+
 
         # Update appointment
         appointment.date = new_date
