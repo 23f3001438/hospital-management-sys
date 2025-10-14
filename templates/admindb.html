@@ -142,6 +142,7 @@
             <option value="all" {% if request.args.get('category') == 'all' %}selected{% endif %}>All</option>
             <option value="doctor" {% if request.args.get('category') == 'doctor' %}selected{% endif %}>Doctors</option>
             <option value="patient" {% if request.args.get('category') == 'patient' %}selected{% endif %}>Patients</option>
+            <option value="department" {% if request.args.get('category') == 'department' %}selected{% endif %}>Department</option>
         </select>
         <button type="submit" class="search-btn">Search</button>
         <a href="{{ url_for('admindb') }}" style="background-color: #a6d1ff;

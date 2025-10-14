@@ -138,48 +138,58 @@ def admindb():
     departments = Department.query
     admins = Admin.query.all()
 
+    # When search is performed
     if query:
         q = f"%{query}%"
+
+        # Doctor search
         if category == 'doctor':
             doctors = doctors.filter(
                 (Doctor.name.ilike(q)) |
                 (Doctor.username.ilike(q)) |
-                (Doctor.email.ilike(q))
+                (Doctor.email.ilike(q)) |
+                (Doctor.specialization.ilike(q)) |
+                (Doctor.contact.ilike(q))
             ).all()
-            patients = []
-            departments = []
+            patients, departments = [], []
+
+        # Patient search
         elif category == 'patient':
             patients = patients.filter(
                 (Patient.first_name.ilike(q)) |
                 (Patient.last_name.ilike(q)) |
                 (Patient.username.ilike(q)) |
-                (Patient.email.ilike(q))
+                (Patient.email.ilike(q)) |
+                (Patient.contact.ilike(q)) |
+                (Patient.id.cast(db.String).ilike(q))
             ).all()
-            doctors = []
-            departments = []
-        elif category == 'department':
-            departments = departments.filter(
-                (Department.name.ilike(q)) |
-                (Department.description.ilike(q))
-            ).all()
-            doctors = []
-            patients = []
-        else:  # all
+            doctors, departments = [], []
+
+        # Search across all
+        else:
             doctors = doctors.filter(
                 (Doctor.name.ilike(q)) |
                 (Doctor.username.ilike(q)) |
-                (Doctor.email.ilike(q))
+                (Doctor.email.ilike(q)) |
+                (Doctor.specialization.ilike(q)) |
+                (Doctor.contact.ilike(q))
             ).all()
+
             patients = patients.filter(
                 (Patient.first_name.ilike(q)) |
                 (Patient.last_name.ilike(q)) |
                 (Patient.username.ilike(q)) |
-                (Patient.email.ilike(q))
+                (Patient.email.ilike(q)) |
+                (Patient.contact.ilike(q)) |
+                (Patient.id.cast(db.String).ilike(q))
             ).all()
+
             departments = departments.filter(
                 (Department.name.ilike(q)) |
                 (Department.description.ilike(q))
             ).all()
+
+    # If no query, fetch everything normally
     else:
         doctors = doctors.all()
         patients = patients.all()
@@ -193,6 +203,7 @@ def admindb():
         departments=departments,
         search_query=query
     )
+
 
 
 
