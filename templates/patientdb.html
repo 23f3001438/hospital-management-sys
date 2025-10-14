@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Patient Dashboard{% endblock %}
 {% block content %}
+{% block home_button %}{% endblock %}
+
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -16,22 +18,15 @@
         justify-content: space-between;
         align-items: center;
     }
-    .header h1 {
-        margin: 0;
-    }
+    .header h1 { margin: 0; }
     .header .links a {
         color: #ffffff;
         text-decoration: none;
         margin-left: 1rem;
         font-size: 1rem;
     }
-    .section {
-        margin: 1rem auto;
-        padding: 0 1rem;
-    }
-    .section h2 {
-        margin-bottom: 1rem;
-    }
+    .section { margin: 1rem auto; padding: 0 1rem; }
+    .section h2 { margin-bottom: 1rem; }
     .list-item {
         display: flex;
         justify-content: space-between;
@@ -42,9 +37,7 @@
         margin-bottom: 0.5rem;
         background-color: #ffffff;
     }
-    .list-item span {
-        flex: 1;
-    }
+    .list-item span { flex: 1; }
     .list-item .view-btn {
         background-color: #a3c4f3;
         color: #ffffff;
@@ -53,31 +46,14 @@
         border-radius: 5px;
         cursor: pointer;
     }
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-    }
-    .table th, .table td {
-        border: 1px solid #ddd;
-        padding: 0.5rem;
-        text-align: left;
-    }
-    .table th {
-        background-color: #a3c4f3;
-        color: #ffffff;
-    }
-    .table .cancel-btn {
-        background-color: white;
-        padding: 0.5rem;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+    .table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .table th, .table td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+    .table th { background-color: #a3c4f3; color: #ffffff; }
+    .table .cancel-btn { background-color: white; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; }
 </style>
 
 <div class="header">
-    <h1>Welcome {{ patient.name }}</h1>
+    <h1>Welcome {{ patient.first_name }}</h1>
     <div class="links">
         <a href="{{ url_for('edit_patient', patient_id=patient.id) }}">Edit Profile</a>
         <a href="{{ url_for('view_patient_profile', patient_id=patient.id) }}">Profile</a>
@@ -113,10 +89,14 @@
             </tr>
         </thead>
         <tbody>
-            {% for i, appointment in Appointments %}
+            {% for i, appointment in enumerate(upcoming_appointments, start=1) %}
             <tr>
                 <td>{{ i }}</td>
-                <td>{{ appointment.doctor.name }}</td>
+                <td>
+                    <a href="{{ url_for('view_doctor_profile', doctor_id=appointment.doctor.id) }}">
+                        {{ appointment.doctor.name }}
+                    </a>
+                </td>
                 <td>{{ appointment.doctor.department.name }}</td>
                 <td>{{ appointment.date.strftime('%d/%m/%Y') }}</td>
                 <td>{{ appointment.time }}</td>
@@ -134,4 +114,43 @@
         </tbody>
     </table>
 </div>
+
+<div class="section">
+    <h2>Past Appointments</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sr No.</th>
+                <th>Doctor Name</th>
+                <th>Department</th>
+                <th>Date</th>
+                <th>Diagnosis</th>
+                <th>Treatment</th>
+                <th>Prescription</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i, appointment in enumerate(past_appointments, start=1) %}
+            <tr>
+                <td>{{ i }}</td>
+                <td>
+                    <a href="{{ url_for('view_doctor_profile', doctor_id=appointment.doctor.id) }}">
+                        {{ appointment.doctor.name }}
+                    </a>
+                </td>
+                <td>{{ appointment.doctor.department.name }}</td>
+                <td>{{ appointment.date.strftime('%d/%m/%Y') }}</td>
+                <td>{{ appointment.diagnosis or '-' }}</td>
+                <td>{{ appointment.treatment or '-' }}</td>
+                <td>{{ appointment.prescription or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7">No past appointments.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}

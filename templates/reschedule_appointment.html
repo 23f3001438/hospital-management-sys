@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Reschedule Appointment{% endblock %}
+{% block content %}
+
+<h2>Reschedule Appointment with Dr. {{ appointment.doctor.name }}</h2>
+
+<form method="POST">
+    <label for="date">Select New Date:</label>
+    <select name="date" id="date" required>
+        {% for d in available_dates %}
+            <option value="{{ d }}" {% if appointment.date == d %}selected{% endif %}>{{ d }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="time">Time:</label>
+    <input type="time" name="time" value="{{ appointment.time }}" required>
+
+    <button type="submit">Reschedule</button>
+</form>
+
+<a href="{{ url_for('patientdb', patient_id=current_user.id) }}">Back to Dashboard</a>
+
+{% endblock %}

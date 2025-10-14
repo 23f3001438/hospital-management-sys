@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Book Appointment{% endblock %}
+{% block content %}
+{% block home_button %}{% endblock %}
+
+<style>
+form {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #f1f8ff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+h1 { text-align: center; color: #023047; margin-bottom: 1.5rem; }
+label { font-weight: 600; color: #023047; }
+select.form-control, input.form-control {
+    border-radius: 6px;
+    border: 1px solid #a2d2ff;
+    padding: 0.5rem;
+}
+button.btn-success {
+    background-color: #028090;
+    border-color: #028090;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    width: 100%;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+button.btn-success:hover {
+    background-color: #05668d;
+    border-color: #05668d;
+}
+.mb-3 { margin-bottom: 1.2rem !important; }
+</style>
+
+<h1>Book Appointment with Dr. {{ doctor.name }}</h1>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="date">Select Date</label>
+        <select name="date" id="date" class="form-control" required onchange="this.form.submit()">
+            <option value="">-- Select Date --</option>
+            {% for d in available_dates %}
+                <option value="{{ d }}" {% if selected_date == d|string %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {% if selected_date %}
+    <div class="mb-3">
+        <label for="time">Select Time</label>
+        <select name="time" id="time" class="form-control" required>
+            {% for t in available_times %}
+            <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+            {% if not available_times %}
+            <option disabled>No available slots on this date</option>
+            {% endif %}
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Book Appointment</button>
+    {% endif %}
+</form>
+
+
+{% endblock %}

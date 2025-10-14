@@ -2,6 +2,8 @@
 {% block title %}Edit Patient{% endblock %}
 
 {% block content %}
+{% block home_button %}{% endblock %}
+
     <h2>Edit Patient Profile</h2>
     <form action="/edit_patient/{{ patient.id }}" method="POST">
         <label for="first_name">First Name:</label>
@@ -13,10 +15,6 @@
 
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" value="{{ patient.username }}" required>
-        <br><br>
-
-        <label for="doctor_id">Doctor ID:</label>
-        <input type="text" id="doctor_id" name="doctor_id" value="{{ patient.doctor_id }}" required>
         <br><br>
 
         <label for="dob">Date of Birth:</label>

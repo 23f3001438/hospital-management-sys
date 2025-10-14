@@ -38,9 +38,8 @@ class Doctor(db.Model):
     status = db.Column(db.String(20), default='Active', server_default='Active', nullable=False)
     appointments = db.relationship('Appointment', backref='doctor', lazy=True)
     treatments = db.relationship('Treatment', backref='doctor', lazy=True)
-
-
-    
+    open_dates = db.Column(db.Text)  # Comma-separated dates
+    role = db.Column(db.String(20), default='Doctor', nullable=False)
 
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -48,14 +47,31 @@ class Appointment(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.String(20), default='Scheduled')
+    status = db.Column(db.String(20), default='Scheduled')  # Scheduled, Completed, Cancelled
+    diagnosis = db.Column(db.Text)
+    treatment = db.Column(db.Text)
+    prescription = db.Column(db.Text)
+    medical_record = db.relationship('MedicalRecord', backref='appointment', uselist=False)
+
+class DoctorAvailability(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    is_available = db.Column(db.Boolean, default=True)
+
+    doctor = db.relationship('Doctor', backref='availability')
+
+
 
 class MedicalRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    record_date = db.Column(db.Date, default=datetime.utcnow, nullable=False)
-    description = db.Column(db.Text, nullable=False)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.id'), nullable=False)
+    diagnosis = db.Column(db.Text)
     treatment = db.Column(db.Text)
+    prescription = db.Column(db.Text)
+
+    appointment = db.relationship('Appointment', backref='medical_record')
+
 
 class Treatment(db.Model):
     id = db.Column(db.Integer, primary_key=True)

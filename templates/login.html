@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+{% block home_button %}{% endblock %}
+
     <h2>Login</h2>
     <form action="/login" method="POST">
         <label for="role">Role</label>
@@ -25,5 +24,4 @@
         <br><br>
         <button type="submit">Login</button>
     </form>
-</body>
-</html>
+{% endblock %}

@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Registration</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
     <h1>Patient Registration</h1>
     <form action="/register" method="POST">
         <label for="firstName">First Name:</label>
@@ -49,5 +45,4 @@
         <br><br>
         <button type="submit">Register</button>
     </form>
-</body>
-</html> 
+{% endblock %}

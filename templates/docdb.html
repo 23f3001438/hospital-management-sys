@@ -3,42 +3,53 @@
 {% block title %}Doctor's Dashboard{% endblock %}
 
 {% block content %}
+{% block home_button %}{% endblock %}
+
 <div class="header" style="background-color: #a2d2ff; color: #023047; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
     <h1>Welcome Dr. {{ doctor.name }}</h1>
     <a href="{{ url_for('logout') }}" style="color: #023047; text-decoration: none; font-size: 1rem; background-color: #ffadad; padding: 0.5rem 1rem; border-radius: 5px;">Logout</a>
 </div>
 
+<!-- Availability Section -->
 <div class="section mt-4">
-    <h2>Upcoming Appointments</h2>
-    <table class="table table-bordered mt-2">
-        <thead class="table-primary">
-            <tr>
-                <th>Sr No.</th>
-                <th>Patient Name</th>
-                <th>Patient History</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for idx, appointment in Appointments %}
-            <tr>
-                <td>{{ idx }}</td>
-                <td>{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</td>
-                <td><a href="{{ url_for('view_patient_profile', patient_id=appointment.patient.id) }}" class="btn btn-info btn-sm">View Profile</a></td>
-                <td>
-                    <a href="{{ url_for('mark_complete', appointment_id=appointment.id) }}" class="btn btn-success btn-sm">Mark Complete</a>
-                    <a href="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}" class="btn btn-danger btn-sm">Cancel</a>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="4" class="text-center">No upcoming appointments.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h2>Availability (Next 7 Days)</h2>
+    {% if dates %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover mt-2 text-center align-middle">
+            <thead class="table-secondary">
+                <tr>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in dates %}
+                <tr>
+                    <td>{{ d.strftime('%d-%b-%Y') }}</td>
+                    <td>
+                        {% if availability[d] and availability[d].is_available %}
+                            <span class="badge bg-success">Available</span>
+                        {% else %}
+                            <span class="badge bg-danger">Unavailable</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('doctor_availability', doctor_id=doctor.id) }}" class="btn btn-sm btn-primary">Update</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No availability data for the next 7 days.</p>
+    {% endif %}
 </div>
 
+</div>
+
+<!-- Assigned Patients Section -->
 <div class="section mt-4">
     <h2>Assigned Patients</h2>
     {% for patient in assigned_patients %}
@@ -50,6 +61,77 @@
     <p>No patients assigned.</p>
     {% endfor %}
 </div>
+
+<!-- Appointments Section -->
+<div class="section mt-4">
+    <h2>Upcoming Appointments</h2>
+    {% if appointments %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover mt-2 align-middle">
+            <thead class="table-secondary text-center">
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Patient</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                    <th>Medical Record</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td class="text-center">{{ appt.date.strftime('%d-%b-%Y') }}</td>
+                    <td class="text-center">{{ appt.time.strftime('%I:%M %p') }}</td>
+                    <td>{{ appt.patient.first_name }} {{ appt.patient.last_name }}</td>
+                    
+                    <!-- Status -->
+                    <td class="text-center">
+                        {% if appt.status == 'Scheduled' %}
+                            <span class="badge bg-warning text-dark">{{ appt.status }}</span>
+                        {% elif appt.status == 'Completed' %}
+                            <span class="badge bg-success">{{ appt.status }}</span>
+                        {% else %}
+                            <span class="badge bg-danger">{{ appt.status }}</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Update Status -->
+                    <td class="text-center">
+                        <form action="{{ url_for('update_appointment_status', id=appt.id) }}" method="POST" class="d-flex justify-content-center">
+                            <select name="status" class="form-select form-select-sm me-1">
+                                <option value="Scheduled" {% if appt.status=='Scheduled' %}selected{% endif %}>Scheduled</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                        </form>
+                    </td>
+
+                    <!-- Medical Record -->
+                    <td>
+                        {% if appt.medical_record %}
+                        <div class="p-2 border rounded bg-light">
+                            <small><strong>Diagnosis:</strong> {{ appt.medical_record.diagnosis }}</small><br>
+                            <small><strong>Treatment:</strong> {{ appt.medical_record.treatment }}</small><br>
+                            <small><strong>Prescription:</strong> {{ appt.medical_record.prescription }}</small><br>
+                            <a href="{{ url_for('record_details', appointment_id=appt.id) }}" class="btn btn-sm btn-success mt-1">Edit</a>
+                        </div>
+                        {% else %}
+                        <a href="{{ url_for('record_details', appointment_id=appt.id) }}" class="btn btn-sm btn-success">Add</a>
+                        {% endif %}
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No upcoming appointments.</p>
+    {% endif %}
+</div>
+
 
 
 {% endblock %}
