@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, redirect, request, flash, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from model import db, Patient, Doctor, Admin, Department, Appointment, MedicalRecord, Treatment, DoctorAvailability
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, time
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'archimangla'
 
@@ -346,14 +346,6 @@ def mark_complete(appointment_id):
     flash("Appointment marked as completed.", "success")
     return redirect(url_for('docdb', doctor_id=appointment.doctor_id))
 
-@app.route('/appointment/<int:appointment_id>/cancel')
-def cancel_appointment(appointment_id):
-    appointment = Appointment.query.get_or_404(appointment_id)
-    appointment.status = 'Cancelled'
-    db.session.commit()
-    flash("Appointment cancelled.", "warning")
-    return redirect(url_for('docdb', doctor_id=appointment.doctor_id))
-
 
 @app.route('/view_patient_profile/<int:patient_id>')
 def view_patient_profile(patient_id):
@@ -549,67 +541,74 @@ def record_details(appointment_id):
     record = MedicalRecord.query.filter_by(appointment_id=appointment.id).first()
     return render_template('medical_record_form.html', appointment=appointment, record=record)
 
-@app.route('/add_availability', methods=['GET', 'POST'])
-def add_availability():
+@app.route('/doctor/<int:doctor_id>/availability', methods=['GET', 'POST'])
+def doctor_availability(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+
     if request.method == 'POST':
         date_str = request.form['date']
         selected_hours = request.form.getlist('times')
-        doctor_id = 1  # replace with current doctor's ID once login/session implemented
-
         if date_str and selected_hours:
             date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-
             for hour in selected_hours:
-                time_obj = time(int(hour), 0)
-                new_slot = DoctorAvailability(
-                    doctor_id=doctor_id,
-                    date=date_obj,
-                    time=time_obj
-                )
-                db.session.add(new_slot)
-
+                # Only add if it doesn't exist already
+                existing_slot = DoctorAvailability.query.filter_by(
+                    doctor_id=doctor_id, date=date_obj, time=time(hour,0)
+                ).first()
+                if not existing_slot:
+                    new_slot = DoctorAvailability(
+                        doctor_id=doctor_id,
+                        date=date_obj,
+                        time=time(hour,0),
+                        is_available=True
+                    )
+                    db.session.add(new_slot)
             db.session.commit()
             flash('Availability saved successfully!', 'success')
-            return redirect(url_for('docdb'))  # Go back to doctor dashboard
+            return redirect(url_for('docdb', doctor_id=doctor_id))
 
-    return render_template('availability.html')
+    # Show next 7 days
+    today = date.today()
+    next_week = [today + timedelta(days=i) for i in range(7)]
+    availability = {}
+    for d in next_week:
+        slots = DoctorAvailability.query.filter_by(doctor_id=doctor_id, date=d, is_available=True).all()
+        availability[d] = slots  # list of available slots
+
+    return render_template('availability.html', doctor_id=doctor_id, dates=next_week, availability=availability)
 
 
-@app.route('/book_appointment', methods=['GET', 'POST'])
+@app.route('/book_appointment', methods=['GET','POST'])
 def book_appointment():
     doctors = Doctor.query.all()
-    selected_doctor = request.args.get('doctor')
+    selected_doctor = request.args.get('doctor', type=int)
     selected_date = request.args.get('date')
 
     available_dates = []
     available_times = []
 
     if selected_doctor:
-        # fetch unique dates available for this doctor
         dates = DoctorAvailability.query.filter_by(
             doctor_id=selected_doctor, is_available=True
         ).with_entities(DoctorAvailability.date).distinct().all()
         available_dates = [d[0] for d in dates]
 
     if selected_doctor and selected_date:
-        # fetch available times for that date
         times = DoctorAvailability.query.filter_by(
-            doctor_id=selected_doctor,
-            date=selected_date,
-            is_available=True
+            doctor_id=selected_doctor, date=selected_date, is_available=True
         ).with_entities(DoctorAvailability.time).all()
         available_times = [t[0] for t in times]
 
     if request.method == 'POST':
-        doctor_id = request.form['doctor']
+        doctor_id = int(request.form['doctor'])
         date_str = request.form['date']
         time_str = request.form['time']
-        patient_id = 1  # change to current_user.id later
+
+        patient_id = 1  # replace with logged-in patient session
 
         date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
         time_obj = datetime.strptime(time_str, '%H:%M').time()
 
-        # Check if still available
         slot = DoctorAvailability.query.filter_by(
             doctor_id=doctor_id, date=date_obj, time=time_obj, is_available=True
         ).first()
@@ -618,27 +617,26 @@ def book_appointment():
             flash('That slot is no longer available.', 'danger')
             return redirect(url_for('book_appointment'))
 
-        # Book appointment
-        new_appointment = Appointment(
+        new_appt = Appointment(
             patient_id=patient_id,
             doctor_id=doctor_id,
             date=date_obj,
             time=time_obj,
             status='Scheduled'
         )
-        db.session.add(new_appointment)
+        db.session.add(new_appt)
         slot.is_available = False
         db.session.commit()
 
         flash('Appointment booked successfully!', 'success')
-        return redirect(url_for('patientdb'))
+        return redirect(url_for('patientdb', patient_id=patient_id))
 
     return render_template(
         'book_appointment.html',
         doctors=doctors,
         selected_doctor=selected_doctor,
-        available_dates=available_dates,
         selected_date=selected_date,
+        available_dates=available_dates,
         available_times=available_times
     )
 

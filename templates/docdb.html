@@ -32,12 +32,13 @@
                     <tr>
                         <td>{{ d.strftime('%d/%m/%Y') }}</td>
                         <td>
-                            {% if availability[d] and availability[d].is_available %}
+                            {% if availability[d]|length > 0 %}
                                 <span style="color:green;">Available</span>
                             {% else %}
                                 <span style="color:red;">Not Available</span>
                             {% endif %}
                         </td>
+
                     </tr>
                 {% endfor %}
 
