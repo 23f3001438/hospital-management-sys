@@ -576,6 +576,15 @@ def doctor_availability(doctor_id):
         availability[d] = slots  # list of available slots
 
     return render_template('availability.html', doctor_id=doctor_id, dates=next_week, availability=availability)
+    # Show next 7 days
+    today = date.today()
+    next_week = [today + timedelta(days=i) for i in range(7)]
+    availability = {}
+    for d in next_week:
+        slots = DoctorAvailability.query.filter_by(doctor_id=doctor_id, date=d, is_available=True).all()
+        availability[d] = slots  # list of available slots
+
+    return render_template('availability.html', doctor_id=doctor_id, dates=next_week, availability=availability)
 
 
 @app.route('/book_appointment', methods=['GET','POST'])
