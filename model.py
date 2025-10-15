@@ -3,11 +3,6 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-class Department(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
-    description = db.Column(db.Text, nullable=True)  # <-- new description field
-
 
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,7 +21,6 @@ class Patient(db.Model):
     appointments = db.relationship('Appointment', backref='patient', lazy=True)
     treatments = db.relationship('Treatment', backref='patient', lazy=True)
     
-
 class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -61,6 +55,10 @@ class MedicalRecord(db.Model):
     prescription = db.Column(db.String(500))
     date = db.Column(db.Date, nullable=False)
 
+class Department(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    description = db.Column(db.Text, nullable=True)  # <-- new description field
 
 class DoctorAvailability(db.Model):
     id = db.Column(db.Integer, primary_key=True)
