@@ -12,6 +12,10 @@
 
 <!-- Availability Section -->
 <div class="section mt-4">
+    <a href="{{ url_for('doctor_availability', doctor_id=doctor.id) }}" class="btn btn-primary mb-3">
+        Manage Availability
+    </a>
+
     <h2>Availability (Next 7 Days)</h2>
     {% if dates %}
     <div class="table-responsive">
@@ -25,20 +29,18 @@
             </thead>
             <tbody>
                 {% for d in dates %}
-                <tr>
-                    <td>{{ d.strftime('%d-%b-%Y') }}</td>
-                    <td>
-                        {% if availability[d] and availability[d].is_available %}
-                            <span class="badge bg-success">Available</span>
-                        {% else %}
-                            <span class="badge bg-danger">Unavailable</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{{ url_for('doctor_availability', doctor_id=doctor.id) }}" class="btn btn-sm btn-primary">Update</a>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>{{ d.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            {% if availability[d] and availability[d].is_available %}
+                                <span style="color:green;">Available</span>
+                            {% else %}
+                                <span style="color:red;">Not Available</span>
+                            {% endif %}
+                        </td>
+                    </tr>
                 {% endfor %}
+
             </tbody>
         </table>
     </div>

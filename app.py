@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, redirect, request, flash, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
-from model import db, Patient, Doctor, Admin, Department, Appointment, MedicalRecord, Treatment
+from model import db, Patient, Doctor, Admin, Department, Appointment, MedicalRecord, Treatment, DoctorAvailability
 from datetime import datetime, date, timedelta
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'archimangla'
@@ -213,7 +213,6 @@ def patient_dashboard(patient_id):
     )
 
 @app.route('/docdb/<int:doctor_id>')
-@login_required
 def docdb(doctor_id):
     doctor = Doctor.query.get_or_404(doctor_id)
 
@@ -370,10 +369,8 @@ def logout():
     return redirect('/')
 
 @app.route('/patientdb/<int:patient_id>')
-@login_required
 def patientdb(patient_id):
-    if patient_id != current_user.id:
-        abort(403)
+   
 
     patient = Patient.query.get_or_404(patient_id)
     departments = Department.query.all()
@@ -524,14 +521,9 @@ def delete_department(department_id):
     return redirect(url_for('admindb'))
 
 @app.route('/appointment/<int:appointment_id>/record', methods=['GET', 'POST'])
-@login_required
 def record_details(appointment_id):
     appointment = Appointment.query.get_or_404(appointment_id)
     
-    # Optional: only assigned doctor can access
-    if appointment.doctor_id != current_user.id:
-        abort(403)
-
     if request.method == 'POST':
         # Update appointment status if needed
         appointment.status = 'Completed'  # or let the doctor choose separately
@@ -557,84 +549,171 @@ def record_details(appointment_id):
     record = MedicalRecord.query.filter_by(appointment_id=appointment.id).first()
     return render_template('medical_record_form.html', appointment=appointment, record=record)
 
-@app.route('/doctor/<int:doctor_id>/availability', methods=['GET', 'POST'])
-def doctor_availability(doctor_id):
-    doctor = Doctor.query.get_or_404(doctor_id)
-    today = date.today()
-    next_week = [today + timedelta(days=i) for i in range(7)]
+@app.route('/add_availability', methods=['GET', 'POST'])
+def add_availability():
+    if request.method == 'POST':
+        date_str = request.form['date']
+        selected_hours = request.form.getlist('times')
+        doctor_id = 1  # replace with current doctor's ID once login/session implemented
+
+        if date_str and selected_hours:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+            for hour in selected_hours:
+                time_obj = time(int(hour), 0)
+                new_slot = DoctorAvailability(
+                    doctor_id=doctor_id,
+                    date=date_obj,
+                    time=time_obj
+                )
+                db.session.add(new_slot)
+
+            db.session.commit()
+            flash('Availability saved successfully!', 'success')
+            return redirect(url_for('docdb'))  # Go back to doctor dashboard
+
+    return render_template('availability.html')
+
+
+@app.route('/book_appointment', methods=['GET', 'POST'])
+def book_appointment():
+    doctors = Doctor.query.all()
+    selected_doctor = request.args.get('doctor')
+    selected_date = request.args.get('date')
+
+    available_dates = []
+    available_times = []
+
+    if selected_doctor:
+        # fetch unique dates available for this doctor
+        dates = DoctorAvailability.query.filter_by(
+            doctor_id=selected_doctor, is_available=True
+        ).with_entities(DoctorAvailability.date).distinct().all()
+        available_dates = [d[0] for d in dates]
+
+    if selected_doctor and selected_date:
+        # fetch available times for that date
+        times = DoctorAvailability.query.filter_by(
+            doctor_id=selected_doctor,
+            date=selected_date,
+            is_available=True
+        ).with_entities(DoctorAvailability.time).all()
+        available_times = [t[0] for t in times]
 
     if request.method == 'POST':
-        # Loop over the next 7 days and update availability
-        for d in next_week:
-            avail = request.form.get(str(d), 'off') == 'on'
-            entry = DoctorAvailability.query.filter_by(doctor_id=doctor_id, date=d).first()
-            if not entry:
-                entry = DoctorAvailability(doctor_id=doctor_id, date=d)
-                db.session.add(entry)
-            entry.is_available = avail
-        db.session.commit()
-        flash("Availability updated successfully", "success")
-        return redirect(url_for('doctor_availability', doctor_id=doctor_id))
+        doctor_id = request.form['doctor']
+        date_str = request.form['date']
+        time_str = request.form['time']
+        patient_id = 1  # change to current_user.id later
 
-    # For GET request: fetch availability
-    availability = {d: DoctorAvailability.query.filter_by(doctor_id=doctor_id, date=d).first() for d in next_week}
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        time_obj = datetime.strptime(time_str, '%H:%M').time()
 
-    return render_template('availability.html', doctor=doctor, dates=next_week, availability=availability)
-
-@app.route('/book_appointment/<int:doctor_id>', methods=['GET', 'POST'])
-@login_required
-def book_appointment(doctor_id):
-    doctor = Doctor.query.get_or_404(doctor_id)
-
-    today = date.today()
-    next_week = [today + timedelta(days=i) for i in range(7)]
-
-    available_dates = [
-        d for d in next_week
-        if DoctorAvailability.query.filter_by(doctor_id=doctor_id, date=d, is_available=True).first()
-    ]
-
-    selected_date = request.form.get('date') if request.method == 'POST' else None
-
-    # Available times for the selected date
-    available_times = []
-    if selected_date:
-        # Example: 09:00 to 17:00 in 1-hour slots
-        all_slots = [f"{h:02d}:00" for h in range(9, 18)]
-        booked_slots = [
-            appt.time.strftime("%H:%M") 
-            for appt in Appointment.query.filter_by(doctor_id=doctor_id, date=selected_date).all()
-        ]
-        available_times = [slot for slot in all_slots if slot not in booked_slots]
-
-        existing_appointment = Appointment.query.filter_by(
-            doctor_id=doctor_id,
-            date=appointment_date,
-            time=appointment_time,
-            status='Booked'
+        # Check if still available
+        slot = DoctorAvailability.query.filter_by(
+            doctor_id=doctor_id, date=date_obj, time=time_obj, is_available=True
         ).first()
 
-        if existing_appointment:
-            flash("This time slot is already booked for the doctor.", "danger")
-    
+        if not slot:
+            flash('That slot is no longer available.', 'danger')
+            return redirect(url_for('book_appointment'))
 
-        # If patient submits the form with date and time
-        if request.form.get('time'):
-            appointment_time = request.form['time']
-            appointment = Appointment(
-                patient_id=current_user.id,
-                doctor_id=doctor_id,
-                date=selected_date,
-                time=appointment_time,
-                status='Scheduled'
-            )
-            db.session.add(appointment)
-            db.session.commit()
-            flash("Appointment booked successfully!", "success")
-            return redirect(url_for('patientdb', patient_id=current_user.id))
+        # Book appointment
+        new_appointment = Appointment(
+            patient_id=patient_id,
+            doctor_id=doctor_id,
+            date=date_obj,
+            time=time_obj,
+            status='Scheduled'
+        )
+        db.session.add(new_appointment)
+        slot.is_available = False
+        db.session.commit()
+
+        flash('Appointment booked successfully!', 'success')
+        return redirect(url_for('patientdb'))
 
     return render_template(
         'book_appointment.html',
+        doctors=doctors,
+        selected_doctor=selected_doctor,
+        available_dates=available_dates,
+        selected_date=selected_date,
+        available_times=available_times
+    )
+
+@app.route('/appointment/<int:appointment_id>/cancel', methods=['POST'])
+def cancel_appointment(appointment_id):
+    appointment = Appointment.query.get_or_404(appointment_id)
+    
+    # Free up that slot
+    availability = DoctorAvailability.query.filter_by(
+        doctor_id=appointment.doctor_id,
+        date=appointment.date,
+        time=appointment.time
+    ).first()
+    
+    if availability:
+        availability.is_available = True
+
+    appointment.status = 'Cancelled'
+    db.session.commit()
+    flash("Appointment cancelled successfully!", "info")
+    return redirect(url_for('patientdb'))
+
+
+@app.route('/appointment/<int:appointment_id>/reschedule', methods=['GET', 'POST'])
+def reschedule_appointment(appointment_id):
+    appointment = Appointment.query.get_or_404(appointment_id)
+    doctor = appointment.doctor
+
+    selected_date = request.args.get('date')
+    available_dates = DoctorAvailability.query.filter_by(
+        doctor_id=doctor.id, is_available=True
+    ).with_entities(DoctorAvailability.date).distinct().all()
+    available_dates = [d[0] for d in available_dates]
+
+    available_times = []
+    if selected_date:
+        times = DoctorAvailability.query.filter_by(
+            doctor_id=doctor.id,
+            date=selected_date,
+            is_available=True
+        ).with_entities(DoctorAvailability.time).all()
+        available_times = [t[0] for t in times]
+
+    if request.method == 'POST':
+        new_date = request.form['date']
+        new_time = request.form['time']
+
+        slot = DoctorAvailability.query.filter_by(
+            doctor_id=doctor.id, date=new_date, time=new_time, is_available=True
+        ).first()
+
+        if not slot:
+            flash("That time slot is no longer available.", "danger")
+            return redirect(url_for('reschedule_appointment', appointment_id=appointment.id))
+
+        # Free old slot
+        old_slot = DoctorAvailability.query.filter_by(
+            doctor_id=doctor.id,
+            date=appointment.date,
+            time=appointment.time
+        ).first()
+        if old_slot:
+            old_slot.is_available = True
+
+        # Assign new slot
+        appointment.date = new_date
+        appointment.time = new_time
+        slot.is_available = False
+        db.session.commit()
+        flash("Appointment rescheduled successfully!", "success")
+        return redirect(url_for('patientdb'))
+
+    return render_template(
+        'reschedule_appointment.html',
+        appointment=appointment,
         doctor=doctor,
         available_dates=available_dates,
         selected_date=selected_date,
@@ -643,77 +722,17 @@ def book_appointment(doctor_id):
 
 
 
-@app.route('/appointment/<int:appointment_id>/reschedule', methods=['GET', 'POST'])
-@login_required
-def reschedule_appointment(appointment_id):
-    appointment = Appointment.query.get_or_404(appointment_id)
-
-    # Only allow the patient who owns this appointment
-    if appointment.patient_id != current_user.id:
-        abort(403)
-
-    doctor = appointment.doctor
-
-    # Next 7 days availability for this doctor
-    today = date.today()
-    next_week = [today + timedelta(days=i) for i in range(7)]
-    available_dates = [
-        d for d in next_week
-        if DoctorAvailability.query.filter_by(doctor_id=doctor.id, date=d, is_available=True).first()
-    ]
-
-    if request.method == 'POST':
-        new_date = request.form['date']
-        new_time = request.form['time']
-
-        # Check availability
-        avail_entry = DoctorAvailability.query.filter_by(
-            doctor_id=doctor.id, date=new_date, is_available=True
-        ).first()
-        if not avail_entry:
-            flash("Doctor is not available on this date.", "danger")
-            return redirect(url_for('reschedule_appointment', appointment_id=appointment.id))
-        
-        existing_appointment = Appointment.query.filter_by(
-            doctor_id=doctor_id,
-            date=appointment_date,
-            time=appointment_time,
-            status='Booked'
-        ).first()
-
-        if existing_appointment:
-            flash("This time slot is already booked for the doctor.", "danger")
-
-
-        # Update appointment
-        appointment.date = new_date
-        appointment.time = new_time
-        db.session.commit()
-        flash("Appointment rescheduled successfully!", "success")
-        return redirect(url_for('patientdb', patient_id=current_user.id))
-
-    return render_template(
-        'reschedule_appointment.html',
-        appointment=appointment,
-        available_dates=available_dates
-    )
-
-
 @app.route('/appointment/<int:id>/update_status', methods=['POST'])
-@login_required
 def update_appointment_status(id):
     appointment = Appointment.query.get_or_404(id)
-    if appointment.doctor_id != current_user.id:
-        abort(403)
     new_status = request.form.get('status')
     appointment.status = new_status
     db.session.commit()
     flash('Appointment status updated.', 'success')
-    return redirect(url_for('docdb', doctor_id=current_user.id))
+    return redirect(url_for('docdb', doctor_id=appointment.doctor_id))
 
 
 @app.route('/doctors')
-@login_required
 def view_doctors():
     search_name = request.args.get('name', '').strip()
     search_specialization = request.args.get('specialization', '').strip()

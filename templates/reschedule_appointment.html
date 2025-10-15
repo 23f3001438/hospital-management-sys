@@ -2,22 +2,36 @@
 {% block title %}Reschedule Appointment{% endblock %}
 {% block content %}
 
-<h2>Reschedule Appointment with Dr. {{ appointment.doctor.name }}</h2>
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Reschedule Appointment with Dr. {{ appointment.doctor.name }}</h2>
 
-<form method="POST">
-    <label for="date">Select New Date:</label>
-    <select name="date" id="date" required>
-        {% for d in available_dates %}
-            <option value="{{ d }}" {% if appointment.date == d %}selected{% endif %}>{{ d }}</option>
-        {% endfor %}
-    </select>
+    <form method="POST" class="p-4 border rounded bg-light">
+        <div class="mb-3">
+            <label for="date" class="form-label">Select New Date:</label>
+            <select name="date" id="date" class="form-select" required onchange="this.form.submit()">
+                <option value="" disabled selected>Choose a date</option>
+                {% for d in available_dates %}
+                    <option value="{{ d }}" {% if selected_date == d|string %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <label for="time">Time:</label>
-    <input type="time" name="time" value="{{ appointment.time }}" required>
+        {% if available_times %}
+        <div class="mb-3">
+            <label for="time" class="form-label">Select Time Slot:</label>
+            <select name="time" id="time" class="form-select" required>
+                {% for t in available_times %}
+                    <option value="{{ t }}">{{ t }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
 
-    <button type="submit">Reschedule</button>
-</form>
-
-<a href="{{ url_for('patientdb', patient_id=current_user.id) }}">Back to Dashboard</a>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Reschedule</button>
+            <a href="{{ url_for('patientdb', patient_id=appointment.patient_id) }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
 
 {% endblock %}

@@ -1,156 +1,162 @@
-{% extends "base.html" %}
-{% block title %}Patient Dashboard{% endblock %}
-{% block content %}
-{% block home_button %}{% endblock %}
+    {% extends "base.html" %}
+    {% block title %}Patient Dashboard{% endblock %}
+    {% block content %}
+    {% block home_button %}{% endblock %}
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f8f5f9;
-        margin: 0;
-        padding: 0;
-    }
-    .header {
-        background-color: #a3c4f3;
-        color: #ffffff;
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .header h1 { margin: 0; }
-    .header .links a {
-        color: #ffffff;
-        text-decoration: none;
-        margin-left: 1rem;
-        font-size: 1rem;
-    }
-    .section { margin: 1rem auto; padding: 0 1rem; }
-    .section h2 { margin-bottom: 1rem; }
-    .list-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        margin-bottom: 0.5rem;
-        background-color: #ffffff;
-    }
-    .list-item span { flex: 1; }
-    .list-item .view-btn {
-        background-color: #a3c4f3;
-        color: #ffffff;
-        padding: 0.5rem;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    .table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    .table th, .table td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
-    .table th { background-color: #a3c4f3; color: #ffffff; }
-    .table .cancel-btn { background-color: white; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; }
-</style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f5f9;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #a3c4f3;
+            color: #ffffff;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { margin: 0; }
+        .header .links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 1rem;
+            font-size: 1rem;
+        }
+        .section { margin: 1rem auto; padding: 0 1rem; }
+        .section h2 { margin-bottom: 1rem; }
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            background-color: #ffffff;
+        }
+        .list-item span { flex: 1; }
+        .list-item .view-btn {
+            background-color: #a3c4f3;
+            color: #ffffff;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .table th, .table td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+        .table th { background-color: #a3c4f3; color: #ffffff; }
+        .table .cancel-btn { background-color: white; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
 
-<div class="header">
-    <h1>Welcome {{ patient.first_name }}</h1>
-    <div class="links">
-        <a href="{{ url_for('edit_patient', patient_id=patient.id) }}">Edit Profile</a>
-        <a href="{{ url_for('view_patient_profile', patient_id=patient.id) }}">Profile</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
+    <div class="header">
+        <h1>Welcome {{ patient.first_name }}</h1>
+        <div class="links">
+            <a href="{{ url_for('edit_patient', patient_id=patient.id) }}">Edit Profile</a>
+            <a href="{{ url_for('view_patient_profile', patient_id=patient.id) }}">Profile</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
     </div>
-</div>
 
-<div class="section">
-    <h2>Departments</h2>
-    {% for dept in departments %}
-    <div class="list-item">
-        <span>{{ dept.name }}</span>
-        <a href="{{ url_for('view_department', dept_id=dept.id) }}">
-            <button class="view-btn">View Details</button>
-        </a>
+    <div class="section">
+        <h2>Departments</h2>
+        {% for dept in departments %}
+        <div class="list-item">
+            <span>{{ dept.name }}</span>
+            <a href="{{ url_for('view_department', dept_id=dept.id) }}">
+                <button class="view-btn">View Details</button>
+            </a>
+        </div>
+        {% else %}
+        <p>No departments available.</p>
+        {% endfor %}
     </div>
-    {% else %}
-    <p>No departments available.</p>
-    {% endfor %}
-</div>
 
-<div class="section">
-    <h2>Upcoming Appointments</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr No.</th>
-                <th>Doctor Name</th>
-                <th>Department</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for i, appointment in enumerate(upcoming_appointments, start=1) %}
-            <tr>
-                <td>{{ i }}</td>
-                <td>
-                    <a href="{{ url_for('view_doctor_profile', doctor_id=appointment.doctor.id) }}">
-                        {{ appointment.doctor.name }}
-                    </a>
-                </td>
-                <td>{{ appointment.doctor.department.name }}</td>
-                <td>{{ appointment.date.strftime('%d/%m/%Y') }}</td>
-                <td>{{ appointment.time }}</td>
-                <td>
-                    <form action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}" method="POST">
-                        <button class="cancel-btn" type="submit">Cancel</button>
-                    </form>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="6">No upcoming appointments.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <div class="section">
+        <h2>Upcoming Appointments</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sr No.</th>
+                    <th>Doctor Name</th>
+                    <th>Department</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in upcoming_appointments %}
+                <tr>
+                    <td>{{ i }}</td>
+                    <td>
+                        <a href="{{ url_for('view_doctor_profile', doctor_id=appointment.doctor.id) }}">
+                            {{ appointment.doctor.name }}
+                        </a>
+                    </td>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ appointment.doctor.department.name }}</td>
+                    <td>{{ appointment.date.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ appointment.time }}</td>
+                    <td>
+                        <form action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}" method="POST">
+                            <button class="cancel-btn" type="submit">Cancel</button>
+                        </form>
+                        <form action="{{ url_for('reschedule_appointment', appointment_id=appointment.id) }}" method="GET" style="display:inline;">
+                            <button class="cancel-btn" type="submit">Reschedule</button>
+                        </form>
 
-<div class="section">
-    <h2>Past Appointments</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr No.</th>
-                <th>Doctor Name</th>
-                <th>Department</th>
-                <th>Date</th>
-                <th>Diagnosis</th>
-                <th>Treatment</th>
-                <th>Prescription</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for i, appointment in enumerate(past_appointments, start=1) %}
-            <tr>
-                <td>{{ i }}</td>
-                <td>
-                    <a href="{{ url_for('view_doctor_profile', doctor_id=appointment.doctor.id) }}">
-                        {{ appointment.doctor.name }}
-                    </a>
-                </td>
-                <td>{{ appointment.doctor.department.name }}</td>
-                <td>{{ appointment.date.strftime('%d/%m/%Y') }}</td>
-                <td>{{ appointment.diagnosis or '-' }}</td>
-                <td>{{ appointment.treatment or '-' }}</td>
-                <td>{{ appointment.prescription or '-' }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="7">No past appointments.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">No upcoming appointments.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-{% endblock %}
+    <div class="section">
+        <h2>Past Appointments</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sr No.</th>
+                    <th>Doctor Name</th>
+                    <th>Department</th>
+                    <th>Date</th>
+                    <th>Diagnosis</th>
+                    <th>Treatment</th>
+                    <th>Prescription</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in upcoming_appointments %}
+                <tr>
+                    <td>{{ i }}</td>
+                    <td>
+                        <a href="{{ url_for('view_doctor', doctor_id=appointment.doctor.id) }}">
+                            {{ appointment.doctor.name }}
+                        </a>
+
+                    </td>
+                    <td>{{ appointment.doctor.department.name }}</td>
+                    <td>{{ appointment.date.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ appointment.diagnosis or '-' }}</td>
+                    <td>{{ appointment.treatment or '-' }}</td>
+                    <td>{{ appointment.prescription or '-' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No past appointments.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% endblock %}

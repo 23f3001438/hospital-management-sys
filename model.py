@@ -47,30 +47,27 @@ class Appointment(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.String(20), default='Scheduled')  # Scheduled, Completed, Cancelled
-    diagnosis = db.Column(db.Text)
-    treatment = db.Column(db.Text)
-    prescription = db.Column(db.Text)
+    status = db.Column(db.String(20), default='Booked')  # Booked / Completed / Cancelled
+    
+    # Relationship to medical record
     medical_record = db.relationship('MedicalRecord', backref='appointment', uselist=False)
+
+class MedicalRecord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.id'), nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    diagnosis = db.Column(db.String(500))
+    treatment = db.Column(db.String(500))
+    prescription = db.Column(db.String(500))
+    date = db.Column(db.Date, nullable=False)
+
 
 class DoctorAvailability(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    is_available = db.Column(db.Boolean, default=True)
-
-    doctor = db.relationship('Doctor', backref='availability')
-
-
-
-class MedicalRecord(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.id'), nullable=False)
-    diagnosis = db.Column(db.Text)
-    treatment = db.Column(db.Text)
-    prescription = db.Column(db.Text)
-
-    appointment = db.relationship('Appointment', backref='medical_record')
+    is_available = db.Column(db.Boolean, default=False)
+    time = db.Column(db.Time, nullable=False)
 
 
 class Treatment(db.Model):

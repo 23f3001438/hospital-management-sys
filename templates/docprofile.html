@@ -11,22 +11,10 @@
   <p>Contact: {{ doctor.contact }}</p>
   <p>Specialization: {{ doctor.specialization }}</p>
   
+    <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="btn btn-success">
+        Book Appointment
+    </a>
 
-  <h2>Upcoming Appointments</h2>
-  <ul>
-    {% for appointment in appointments %}
-      <li>{{ appointment.date }} with {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</li>
-    {% else %}
-      <li>No upcoming appointments.</li>
-    {% endfor %}
-  </ul>
 
-  <h2>Assigned Patients</h2>
-  <ul>
-    {% for patient in assigned_patients %}
-      <li>{{ patient.first_name }} {{ patient.last_name }}</li>
-    {% else %}
-      <li>No assigned patients.</li>
-    {% endfor %}
-  </ul>
+
 {% endblock %}
