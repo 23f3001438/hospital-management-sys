@@ -54,7 +54,8 @@
                 Specialization: {{ doctor.specialization }} <br>
                 Appointments: {{ doctor.appointments|length }}
             </div>
-            <a href="{{ url_for('view_doctor', doctor_id=doctor.id) }}">View Profile</a>
+            <a href="{{ url_for('view_doctor', doctor_id=doctor.id, patient_id=patient.id) }}">View Profile</a>
+
         </div>
         {% endfor %}
     {% else %}

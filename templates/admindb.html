@@ -13,6 +13,17 @@
 {% endmacro %}
 
 <style>
+    .btn-primary {
+        background-color: #8cbbed;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin: 1rem 0;
+    }
     body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -299,5 +310,8 @@
         </tbody>
     </table>
 </div>
+
+<a href="{{ url_for('admin_appointments') }}" class="btn btn-primary">View All Appointments</a>
+
 
 {% endblock %}

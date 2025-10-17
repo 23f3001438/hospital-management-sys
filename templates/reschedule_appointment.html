@@ -8,12 +8,13 @@
     <form method="POST" class="p-4 border rounded bg-light">
         <div class="mb-3">
             <label for="date" class="form-label">Select New Date:</label>
-            <select name="date" id="date" class="form-select" required onchange="this.form.submit()">
+            <select name="date" class="form-select" required onchange="window.location.href='?date='+this.value;">
                 <option value="" disabled selected>Choose a date</option>
                 {% for d in available_dates %}
-                    <option value="{{ d }}" {% if selected_date == d|string %}selected{% endif %}>{{ d }}</option>
+                    <option value="{{ d }}" {% if selected_date == d %}selected{% endif %}>{{ d }}</option>
                 {% endfor %}
             </select>
+
         </div>
 
         {% if available_times %}

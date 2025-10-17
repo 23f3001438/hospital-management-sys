@@ -41,10 +41,11 @@ class Appointment(db.Model):
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.String(20), default='Booked')  # Booked / Completed / Cancelled
+    status = db.Column(db.String(20), default='Scheduled')
     
-    # Relationship to medical record
     medical_record = db.relationship('MedicalRecord', backref='appointment', uselist=False)
+
+
 
 class MedicalRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,6 +56,7 @@ class MedicalRecord(db.Model):
     prescription = db.Column(db.String(500))
     date = db.Column(db.Date, nullable=False)
 
+
 class Department(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
@@ -64,8 +66,8 @@ class DoctorAvailability(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    is_available = db.Column(db.Boolean, default=False)
     time = db.Column(db.Time, nullable=False)
+    is_available = db.Column(db.Boolean, default=True)
 
 
 class Treatment(db.Model):

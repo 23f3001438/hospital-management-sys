@@ -21,7 +21,6 @@
             <thead class="table-secondary text-center">
                 <tr>
                     <th>Date</th>
-                    <th>Description / Notes</th>
                     <th>Diagnosis</th>
                     <th>Treatment</th>
                     <th>Prescription</th>
@@ -32,7 +31,6 @@
                 {% for record in patient.medical_records %}
                 <tr>
                     <td class="text-center">{{ record.date.strftime('%d-%b-%Y') }}</td>
-                    <td>{{ record.description or '-' }}</td>
                     <td>{{ record.diagnosis or '-' }}</td>
                     <td>{{ record.treatment or '-' }}</td>
                     <td>{{ record.prescription or '-' }}</td>
@@ -49,5 +47,5 @@
     {% endif %}
     <br>
 
-  <a href="{{ url_for('edit_patient', patient_id=patient.id) }}">Edit Profile</a>
+  
 {% endblock %}

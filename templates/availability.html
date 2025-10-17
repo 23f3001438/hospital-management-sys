@@ -8,24 +8,40 @@
     <form method="POST" action="{{ url_for('doctor_availability', doctor_id=doctor_id) }}">
         <div class="mb-3">
             <label for="date" class="form-label">Select Date</label>
-            <input type="date" id="date" name="date" class="form-control" required>
+            <select name="date" id="date" class="form-control" required onchange="this.form.submit()">
+                <option value="">-- Select Date --</option>
+                {% for d in dates %}
+                    <option value="{{ d }}" {% if selected_date == d %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+            </select>
         </div>
 
+        {% if selected_date %}
         <div class="mb-3">
             <label class="form-label">Select Time Slots</label>
             <div class="d-flex flex-wrap">
                 {% for hour in range(10, 18) %}
+                    {% set slot_booked = False %}
+                    {% if availability[selected_date] is defined %}
+                        {% for slot_time, is_free in availability[selected_date].items() %}
+                            {% if slot_time.hour == hour and not is_free %}
+                                {% set slot_booked = True %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                     <div class="form-check me-3">
-                        <input class="form-check-input" type="checkbox" name="times" value="{{ hour }}" id="slot{{ hour }}">
+                        <input class="form-check-input" type="checkbox" name="times" value="{{ hour }}"
+                               id="slot{{ hour }}" {% if slot_booked %}disabled{% endif %}>
                         <label class="form-check-label" for="slot{{ hour }}">
-                            {{ "%02d:00 - %02d:00" | format(hour, hour+1) }}
+                            {{ "%02d:00 - %02d:00"|format(hour, hour+1) }}
+                            {% if slot_booked %}(Booked){% endif %}
                         </label>
                     </div>
                 {% endfor %}
             </div>
         </div>
-
-        <button type="submit" class="btn btn-primary">Save Availability</button>
+        <button type="submit" class="btn btn-primary mt-3">Save Availability</button>
+        {% endif %}
     </form>
 </div>
 {% endblock %}

@@ -1,48 +1,56 @@
 {% extends "base.html" %}
 {% block title %}Book Appointment{% endblock %}
 {% block content %}
+<style>
+    .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+    }
+    .form-label { font-weight: bold; }
+    .form-select, .btn { width: 100%; padding: 10px; margin-top: 10px; }
+    .btn-primary {
+        background-color: #007bff; color: white; border: none;
+        border-radius: 5px; cursor: pointer;
+    }
+    .btn-primary:hover { background-color: #0056b3; }
+</style>
+
 <div class="container mt-5">
-  <h3 class="text-center mb-4">Book Appointment</h3>
+    <h3 class="text-center mb-4">Book Appointment with Dr. {{ doctor.name }}</h3>
 
-  <form method="get" action="{{ url_for('book_appointment') }}">
-    <div class="mb-3">
-      <label class="form-label">Select Doctor</label>
-      <select name="doctor" class="form-select" onchange="this.form.submit()">
-        <option value="">-- Select Doctor --</option>
-        {% for doc in doctors %}
-        <option value="{{ doc.id }}" {% if selected_doctor and doc.id == selected_doctor|int %}selected{% endif %}>{{ doc.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
+    <form method="POST" action="{{ url_for('book_appointment', doctor_id=doctor.id) }}">
+        <input type="hidden" name="patient_id" value="{{ patient_id }}">
 
-    {% if available_dates %}
-    <div class="mb-3">
-      <label class="form-label">Select Date</label>
-      <select name="date" class="form-select" onchange="this.form.submit()">
-        <option value="">-- Select Date --</option>
-        {% for d in available_dates %}
-        <option value="{{ d }}" {% if selected_date == d|string %}selected{% endif %}>{{ d }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    {% endif %}
-  </form>
+        <!-- Date Dropdown -->
+        <div class="mb-3">
+            <label class="form-label" for="date">Select Date</label>
+            <select name="date" id="date" class="form-select" required onchange="this.form.submit()">
+                <option value="">-- Select Date --</option>
+                {% for d in available_dates %}
+                    <option value="{{ d }}" {% if selected_date == d %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-  {% if available_times %}
-  <form method="post" action="{{ url_for('book_appointment') }}">
-    <input type="hidden" name="doctor" value="{{ selected_doctor }}">
-    <input type="hidden" name="date" value="{{ selected_date }}">
-    <div class="mb-3">
-      <label class="form-label">Select Time</label>
-      <select name="time" class="form-select" required>
-        <option value="">-- Select Time --</option>
-        {% for t in available_times %}
-        <option value="{{ t.strftime('%H:%M') }}">{{ t.strftime('%I:%M %p') }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Confirm Booking</button>
-  </form>
-  {% endif %}
+        <!-- Time Dropdown -->
+        {% if available_times %}
+        <div class="mb-3">
+            <label class="form-label" for="time">Select Time Slot</label>
+            <select name="time" id="time" class="form-select" required>
+                <option value="">-- Select Time --</option>
+                {% for t in available_times %}
+                    <option value="{{ t.strftime('%H:%M') }}">{{ t.strftime('%I:%M %p') }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+        {% else %}
+        <p class="text-danger">No slots available for this date. Please select another date.</p>
+        {% endif %}
+    </form>
 </div>
 {% endblock %}

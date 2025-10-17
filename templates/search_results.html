@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+{% block content %}
+<style>
+    body { font-family: Arial, sans-serif; background-color: #f8f5f9; }
+    .container { max-width: 800px; margin: 2rem auto; background: white; padding: 1.5rem; border-radius: 10px; }
+    h2 { color: #4a4a4a; }
+    .list-item { display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #ddd; }
+    .view-btn {
+        background-color: #a3c4f3; color: white; border: none;
+        padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer;
+    }
+</style>
+
+<div class="container">
+    <h2>Search Results for "{{ query }}"</h2>
+
+    {% if doctors %}
+        {% for doctor in doctors %}
+        <div class="list-item">
+            <div>
+                <strong>{{ doctor.name }}</strong> — {{ doctor.specialization }}<br>
+                <small>Upcoming Appointments: {{ doctor.num_appointments }}</small>
+            </div>
+            <a href="{{ url_for('view_doctor', doctor_id=doctor.id, patient_id=patient.id) }}">
+                <button class="view-btn">View Profile</button>
+            </a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No doctors found matching your search.</p>
+    {% endif %}
+
+    <a href="{{ url_for('patientdb', patient_id=patient.id) }}" style="display:inline-block; margin-top:1rem;">← Back to Dashboard</a>
+</div>
+{% endblock %}
