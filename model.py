@@ -86,14 +86,4 @@ class Admin(db.Model):
     name = db.Column(db.String(), nullable=False)
     hospital_accounts = db.relationship('HospitalAccounts', backref='admin', lazy=True)
 
-class HospitalAccounts(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'), nullable=False)
-    total_revenue = db.Column(db.Float, nullable=False, default=0.0)
-    total_expenses = db.Column(db.Float, nullable=False, default=0.0)
 
-    def update_revenue(self, amount):
-        self.total_revenue += amount
-
-    def update_expenses(self, amount):
-        self.total_expenses += amount
