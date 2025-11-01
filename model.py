@@ -34,6 +34,8 @@ class Doctor(db.Model):
     treatments = db.relationship('Treatment', backref='doctor', lazy=True)
     open_dates = db.Column(db.Text)  # Comma-separated dates
     role = db.Column(db.String(20), default='Doctor', nullable=False)
+    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'), nullable=True)
+    department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=True)
 
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -84,3 +86,4 @@ class Admin(db.Model):
     password = db.Column(db.String(255), nullable=False)
     contact = db.Column(db.String, nullable=False)
     name = db.Column(db.String(), nullable=False)
+    role = db.Column(db.String(20), default='Admin', nullable=False)

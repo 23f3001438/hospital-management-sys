@@ -543,29 +543,51 @@ def doctor_availability(doctor_id):
     doctor = Doctor.query.get_or_404(doctor_id)
     today = date.today()
     next_week = [today + timedelta(days=i) for i in range(7)]
+    dates = [d.strftime('%Y-%m-%d') for d in next_week]
 
-    # Handle POST: save availability
+    # Create a default availability dictionary
+    availability = {}
+    for d in next_week:
+        date_str = d.strftime('%Y-%m-%d')
+        slots = {}
+        for hour in range(10, 18):
+            slot_time = time(hour, 0)
+            slot = DoctorAvailability.query.filter_by(
+                doctor_id=doctor.id, date=d, time=slot_time
+            ).first()
+            slots[slot_time] = slot.is_available if slot else True
+        availability[date_str] = slots
+
     if request.method == 'POST':
         date_str = request.form.get('date')
         selected_hours = request.form.getlist('times')
 
+        # 🟡 Case 1: User just selected a date → show time slots
+        if date_str and not selected_hours:
+            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            return render_template(
+                'availability.html',
+                doctor_id=doctor_id,
+                dates=dates,
+                selected_date=date_str,
+                availability=availability
+            )
+
+        # 🔴 Case 2: Invalid submission (no date or no times selected)
         if not date_str or not selected_hours:
             flash('Please select a date and at least one time slot.', 'warning')
             return redirect(url_for('doctor_availability', doctor_id=doctor_id))
 
+        # ✅ Case 3: Save selected time slots
         date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-
-        # Ensure all slots from 10-18 exist
         for hour in range(10, 18):
             slot_time = time(hour, 0)
             slot = DoctorAvailability.query.filter_by(
                 doctor_id=doctor.id, date=date_obj, time=slot_time
             ).first()
 
-            # Slot selected by doctor
             if str(hour) in selected_hours:
                 if slot:
-                    # Only mark available if not already booked
                     if not Appointment.query.filter_by(
                         doctor_id=doctor.id, date=date_obj, time=slot_time, status='Scheduled'
                     ).first():
@@ -578,7 +600,6 @@ def doctor_availability(doctor_id):
                         is_available=True
                     ))
             else:
-                # Unselected: mark unavailable only if not booked
                 if slot and not Appointment.query.filter_by(
                     doctor_id=doctor.id, date=date_obj, time=slot_time, status='Scheduled'
                 ).first():
@@ -588,28 +609,13 @@ def doctor_availability(doctor_id):
         flash('Availability updated successfully!', 'success')
         return redirect(url_for('doctor_availability', doctor_id=doctor_id))
 
-    # GET: prepare availability dictionary
-    availability = {}
-    for d in next_week:
-        all_slots = DoctorAvailability.query.filter_by(
-            doctor_id=doctor.id, date=d
-        ).all()
-        booked_times = [a.time for a in Appointment.query.filter_by(
-            doctor_id=doctor.id, date=d, status='Scheduled'
-        ).all()]
-        availability[d] = {slot.time: slot.is_available and slot.time not in booked_times for slot in all_slots}
-
-    # Optional: track selected_date if coming from query parameter
-    selected_date_str = request.args.get('date')
-    selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date() if selected_date_str else None
-
+    # Default GET request
     return render_template(
         'availability.html',
-        doctor=doctor,
-        doctor_id=doctor.id,
-        dates=next_week,
-        availability=availability,
-        selected_date=selected_date
+        doctor_id=doctor_id,
+        dates=dates,
+        selected_date=None,
+        availability=availability
     )
 
 @app.route("/book_appointment/<int:doctor_id>", methods=["GET", "POST"])
@@ -758,7 +764,8 @@ def reschedule_appointment(appointment_id):
         new_time_str = request.form['time']
 
         new_date = datetime.strptime(new_date_str, "%Y-%m-%d").date()
-        new_time = datetime.strptime(new_time_str, "%H:%M").time()
+        new_time = datetime.strptime(new_time_str, "%H:%M:%S").time()
+
 
         # Check if new slot is still available and not booked
         slot = DoctorAvailability.query.filter_by(
@@ -864,6 +871,7 @@ def admin_appointments():
 
     upcoming_appointments = [a for a in appointments if a.date >= today and a.status != 'Cancelled']
     past_appointments = [a for a in appointments if a.date < today or a.status in ['Cancelled', 'Completed']]
+
 
     return render_template(
         'admin_appointments.html',

@@ -6,9 +6,10 @@
     <h3 class="text-center mb-4">Set Your Availability</h3>
 
     <form method="POST" action="{{ url_for('doctor_availability', doctor_id=doctor_id) }}">
+        <!-- Select Date -->
         <div class="mb-3">
             <label for="date" class="form-label">Select Date</label>
-            <select name="date" id="date" class="form-control" required onchange="this.form.submit()">
+            <select name="date" id="date" class="form-control" required>
                 <option value="">-- Select Date --</option>
                 {% for d in dates %}
                     <option value="{{ d }}" {% if selected_date == d %}selected{% endif %}>{{ d }}</option>
@@ -16,31 +17,44 @@
             </select>
         </div>
 
+        <!-- Show "Load Time Slots" only when no slots are displayed yet -->
+        {% if not selected_date %}
+            <button type="submit" class="btn btn-primary">Load Time Slots</button>
+        {% endif %}
+
+        <!-- Time Slots -->
         {% if selected_date %}
         <div class="mb-3">
             <label class="form-label">Select Time Slots</label>
             <div class="d-flex flex-wrap">
                 {% for hour in range(10, 18) %}
+                    {% set slot_time = hour|string + ':00' %}
                     {% set slot_booked = False %}
                     {% if availability[selected_date] is defined %}
-                        {% for slot_time, is_free in availability[selected_date].items() %}
-                            {% if slot_time.hour == hour and not is_free %}
-                                {% set slot_booked = True %}
+                        {% for t, is_free in availability[selected_date].items() %}
+                            {% if t.hour == hour %}
+                                {% set slot_booked = not is_free %}
                             {% endif %}
                         {% endfor %}
                     {% endif %}
-                    <div class="form-check me-3">
+                    <div class="form-check me-3 mb-2">
                         <input class="form-check-input" type="checkbox" name="times" value="{{ hour }}"
-                               id="slot{{ hour }}" {% if slot_booked %}disabled{% endif %}>
+                            id="slot{{ hour }}"
+                            {% if not slot_booked %}checked{% endif %}
+>
                         <label class="form-check-label" for="slot{{ hour }}">
-                            {{ "%02d:00 - %02d:00"|format(hour, hour+1) }}
-                            {% if slot_booked %}(Booked){% endif %}
+                            {{ hour }}:00 - {{ hour + 1 }}:00
                         </label>
                     </div>
                 {% endfor %}
             </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Save Availability</button>
+
+        <!-- Hidden input to persist date during slot submission -->
+        <input type="hidden" name="date" value="{{ selected_date }}">
+
+        <!-- Save Button -->
+        <button type="submit" class="btn btn-success mt-3">Save Availability</button>
         {% endif %}
     </form>
 </div>
