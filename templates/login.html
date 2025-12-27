@@ -3,25 +3,114 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-{% block home_button %}{% endblock %}
 
-    <h2>Login</h2>
-    <form action="/login" method="POST">
-        <label for="role">Role</label>
-        <select id="role" name="role" required>
-            <option value="">Select Role</option>
-            <option value="doctor">Doctor</option>
-            <option value="patient">Patient</option>
-            <option value="admin">Admin</option>
-        </select>
-        
-        <br><br>
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" placeholder="Enter your username" required>
-        <br><br>
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-        <br><br>
-        <button type="submit">Login</button>
+<style>
+    .login-card {
+        width: 60%;
+        max-width: 450px;
+        margin: 60px auto;
+        padding: 2.3rem;
+        background: linear-gradient(135deg, #ffd6e8 0%, #c6e0ff 100%);
+        border-radius: 25px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        backdrop-filter: blur(8px);
+        animation: fadeUp 0.7s ease-out;
+    }
+
+    .login-title {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #243b6e;
+        margin-bottom: 1.5rem;
+    }
+
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .login-form .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .login-form label {
+        font-weight: 600;
+        color: #334a7c;
+        font-size: 0.95rem;
+    }
+
+    .login-form input,
+    .login-form select {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #cbd6f3;
+        font-size: 1rem;
+        background: white;
+        outline: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .login-form input:focus,
+    .login-form select:focus {
+        border-color: #7aa7ff;
+        box-shadow: 0 0 12px rgba(122,167,255,0.6);
+    }
+
+    .login-btn {
+        padding: 12px;
+        background: linear-gradient(135deg, #6ea8ff, #a689ff);
+        border: none;
+        border-radius: 30px;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+        transition: 0.25s;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 26px rgba(0,0,0,0.22);
+        filter: brightness(1.1);
+    }
+</style>
+
+<div class="login-card">
+
+    <h2 class="login-title">Login</h2>
+
+    <form action="/login" method="POST" class="login-form">
+
+        <div class="input-group">
+            <label for="role">Role</label>
+            <select id="role" name="role" required>
+                <option value="" disabled selected>Select Role</option>
+                <option value="doctor">Doctor</option>
+                <option value="patient">Patient</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <button type="submit" class="login-btn">Login</button>
+
     </form>
+
+</div>
+
 {% endblock %}

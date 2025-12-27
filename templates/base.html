@@ -6,6 +6,113 @@
     <title>{% block title %}My App{% endblock %}</title>    
     <!-- Optional: Bootstrap CSS for styling flash messages -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- fonts & icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* register card same aesthetic as home card */
+        .register-card {
+            width: 70%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 2.5rem;
+            background: linear-gradient(135deg, #ffd6e8 0%, #c6e0ff 100%);
+            border-radius: 25px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+            backdrop-filter: blur(8px);
+            animation: fadeUp 0.7s ease-out;
+        }
+
+        /* heading */
+        .reg-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #243b6e;
+            margin-bottom: 1.5rem;
+        }
+
+        /* form layout */
+        .reg-form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* form inputs */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #334a7c;
+            font-size: 0.95rem;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd6f3;
+            font-size: 1rem;
+            outline: none;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            border-color: #7aa7ff;
+            box-shadow: 0 0 12px rgba(122,167,255,0.6);
+        }
+
+        /* button */
+        .reg-btn {
+            padding: 12px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #6ea8ff, #a689ff);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+            transition: 0.25s;
+        }
+
+        .reg-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.22);
+            filter: brightness(1.1);
+        }
+        /* Premium moving background for all pages */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+
+            background: linear-gradient(135deg, #f2f7ff 0%, #ffe3f0 40%, #d7e9ff 100%);
+            background-size: 200% 200%;
+            animation: bgShift 10s ease-in-out infinite;
+        }
+
+        /* slow clean movement */
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+
+    </style>
+
 </head>
 <body>
 
