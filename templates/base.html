@@ -10,6 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            background: var(--bg-main);
+        }
         :root {
             /* Brand colors */
             --primary: #6ea8ff;
@@ -32,6 +37,22 @@
             --shadow-soft: 0 10px 25px rgba(0,0,0,0.12);
             --shadow-hover: 0 15px 30px rgba(0,0,0,0.2);
         }
+        /* Global card component */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            padding: 2.5rem;
+            margin: 2rem auto;
+            backdrop-filter: blur(6px);
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
 
         /* register card same aesthetic as home card */
         .register-card {
@@ -39,9 +60,9 @@
             max-width: 600px;
             margin: 50px auto;
             padding: 2.5rem;
-            background: linear-gradient(135deg, #ffd6e8 0%, #c6e0ff 100%);
+            /*background: linear-gradient(135deg, #ffd6e8 0%, #c6e0ff 100%);
             border-radius: 25px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.12);*/
             backdrop-filter: blur(8px);
             animation: fadeUp 0.7s ease-out;
         }
@@ -122,6 +143,25 @@
             background: var(--bg-main);
             overflow-x: hidden;
         }
+        /* Fix horizontal seam under Home icon */
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            background: var(--bg-main);
+        }
+
+        /* Top navigation / home link must not introduce its own layer */
+        header,
+        nav,
+        .header,
+        .top-bar,
+        .home-link,
+        .home-container {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
 
 
         /* slow clean movement */
