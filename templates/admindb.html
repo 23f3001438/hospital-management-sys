@@ -15,26 +15,39 @@
 
     /* Top header */
     .header {
-        background: linear-gradient(135deg, #8ac6ff, #a8b4ff);
-        color: white;
-        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(14px) saturate(120%);
+        color: var(--text-main);
+
+        padding: 1.6rem 1rem;
         text-align: center;
-        border-radius: 0 0 25px 25px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        margin-bottom: 2rem;
+
+        border-radius: 22px;
+        box-shadow: 0 12px 30px rgba(40, 60, 120, 0.18);
+        margin-bottom: 2.2rem;
+    }
+
+
+    .header h1 {
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: 0.2px;
     }
 
     /* Logout / Home btn */
     .header a {
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-        font-weight: bold;
-        background: white;
-        color: #2b3f75;
-        text-decoration: none;
-        margin-left: 0.5rem;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        background: rgba(255,255,255,0.55);
+        color: var(--text-main);
+        backdrop-filter: blur(6px);
+
+        padding: 0.4rem 0.9rem;
+        border-radius: 999px;
+        font-weight: 600;
+
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
     }
+
+
 
     /* Page wrapper container */
     .dashboard-container {
@@ -45,7 +58,7 @@
 
     /* Section cards */
     .section-card {
-        background: rgba(255,255,255,0.85);
+        background: transparent;
         border-radius: 20px;
         padding: 1.5rem 1.5rem;
         margin: 2rem 0;
@@ -80,7 +93,9 @@
 
     .search-btn,
     .clear-btn {
-        background: #8cbbed;
+        background: rgba(255,255,255,0.55);
+        color: var(--text-main);
+        backdrop-filter: blur(6px);
         border-radius: 10px;
         padding: 0.6rem 1rem;
         border: none;
@@ -96,17 +111,20 @@
         border-collapse: collapse;
         border-radius: 15px;
         overflow: hidden;
-        background: white;
+        background: transparent;
         box-shadow: 0 6px 20px rgba(0,0,0,0.12);
     }
 
     .table th {
-        background: #8cbbed;
-        color: white;
-        padding: 0.85rem;
-        text-align: left;
+        background: rgba(255, 255, 255, 0.22);
+        color: var(--text-main);
         font-weight: 600;
-        letter-spacing: 0.02em;
+        backdrop-filter: blur(8px);
+    }
+
+
+    .table tr {
+        background: rgba(255, 255, 255, 0.18);
     }
 
 
@@ -114,17 +132,60 @@
         padding: 0.8rem;
         border-bottom: 1px solid #eef1ff;
         white-space: nowrap;
+        background: transparent;
+        color: #2b2f4a;
     }
 
+
     .table tr:hover {
-        background: #f5f9ff;
+        background: rgba(255, 255, 255, 0.28);
     }
     .table tbody tr:nth-child(even) {
         background: #f7f9ff;
     }
     .table td,
-    .table th {
-        vertical-align: middle;
+    .section-card .table thead th {
+        background: rgba(255, 255, 255, 0.28);
+        color: var(--text-main);
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255,255,255,0.35);
+    }
+    .section-card .table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .section-card .table td {
+        padding: 0.9rem 0.9rem;
+    }
+
+
+    .section-card .table tbody tr:first-child td:last-child {
+        border-top-right-radius: 12px;
+    }
+
+    .section-card .table tbody tr:last-child td:first-child {
+        border-bottom-left-radius: 12px;
+    }
+
+    .section-card .table tbody tr:last-child td:last-child {
+        border-bottom-right-radius: 12px;
+    }
+    .section-card > .create-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        margin-bottom: 18px;
+        padding: 0.55rem 1.3rem;
+
+        font-size: 0.95rem;
+        letter-spacing: 0.2px;
+    }
+    .section-card > .create-btn::before {
+        content: "+";
+        font-weight: 700;
     }
 
 
@@ -138,7 +199,35 @@
         padding: 0.45rem 0.8rem;
         margin-right: 4px;
         display: inline-block;
+        backdrop-filter: blur(4px);
     }
+    .section-card .table {
+        background: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+    }
+    .section-card .table tbody tr {
+        background: rgba(255, 255, 255, 0.18) !important;
+    }
+
+    .section-card .table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.28) !important;
+    }
+
+    .section-card .table-striped tbody tr:nth-of-type(odd),
+    .section-card .table-striped tbody tr:nth-of-type(even) {
+        background: rgba(255,255,255,0.18) !important;
+    }
+    .section-card td a {
+        margin-right: 6px;
+        margin-bottom: 4px;
+    }
+    .section-card > .create-btn {
+        display: inline-block;
+        margin-bottom: 14px;
+    }
+
+
 
 </style>
 
@@ -265,26 +354,25 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Name</th>
                     <th>Description</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for department in departments %}
-                <tr>
-                    <td>{{ department.id }}</td>
-                    <td>{{ highlight(department.name, search_query) }}</td>
-                    <td>{{ highlight(department.description, search_query) }}</td>
-                    <td>
-                        <a class="view-btn" href="{{ url_for('view_department', dept_id=department.id) }}">View</a>
-                        <a class="edit-btn" href="{{ url_for('edit_department', department_id=department.id) }}">Edit</a>
-                        <a class="delete-btn" href="{{ url_for('delete_department', department_id=department.id) }}">Delete</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+        {% for department in departments %}
+        <tr>
+            <td>{{ highlight(department.name, search_query) }}</td>
+            <td>{{ highlight(department.description, search_query) }}</td>
+            <td>
+                <a class="view-btn" href="{{ url_for('view_department', dept_id=department.id) }}">View</a>
+                <a class="edit-btn" href="{{ url_for('edit_department', department_id=department.id) }}">Edit</a>
+                <a class="delete-btn" href="{{ url_for('delete_department', department_id=department.id) }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+
         </table>
     </div>
 

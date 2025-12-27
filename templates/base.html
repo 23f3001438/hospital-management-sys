@@ -10,6 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        body {
+            background:
+                radial-gradient(1200px 600px at 10% 10%, rgba(173, 216, 255, 0.35), transparent 60%),
+                radial-gradient(900px 500px at 90% 20%, rgba(255, 182, 213, 0.35), transparent 55%),
+                radial-gradient(800px 600px at 50% 90%, rgba(190, 255, 200, 0.30), transparent 60%),
+                #f4f6ff;
+            background-attachment: fixed;
+        }
         html, body {
             min-height: 100%;
             margin: 0;
@@ -39,13 +47,16 @@
         }
         /* Global card component */
         .card {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-soft);
-            padding: 2.5rem;
-            margin: 2rem auto;
-            backdrop-filter: blur(6px);
-            transition: box-shadow 0.25s ease, transform 0.25s ease;
+            background: rgba(255, 255, 255, 0.38);
+            backdrop-filter: blur(16px) saturate(120%);
+            -webkit-backdrop-filter: blur(16px) saturate(120%);
+            border-radius: 22px;
+
+            border: 1px solid rgba(255, 255, 255, 0.25);
+
+            box-shadow:
+                0 20px 40px rgba(40, 60, 120, 0.18),
+                inset 0 1px 1px rgba(255, 255, 255, 0.25);
         }
 
         .card:hover {
@@ -56,6 +67,14 @@
         .container {
             padding-top: 2.5rem;
             padding-bottom: 2.5rem;
+        }
+
+        .card h1,
+        .card h2,
+        .card h3 {
+            color: #2b3f75;
+            margin-top: 0;
+            margin-bottom: 1rem;
         }
 
         /* =========================
@@ -80,9 +99,9 @@
         .login-btn,
         .reg-btn,
         .create-btn {
-            background: linear-gradient(135deg, #6ea8ff, #a689ff);
-            color: white;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #a689ff, #ffd6e8);
+            color: #2b3f75;
+            box-shadow: 0 8px 18px rgba(40,60,120,0.18);
         }
 
         .login-btn:hover,
