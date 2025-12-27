@@ -10,6 +10,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        :root {
+            /* Brand colors */
+            --primary: #6ea8ff;
+            --secondary: #a689ff;
+            --accent: #ffd6e8;
+
+            /* Backgrounds */
+            --bg-main: linear-gradient(135deg, #f2f7ff 0%, #ffe3f0 40%, #d7e9ff 100%);
+            --bg-card: linear-gradient(135deg, #ffd6e8 0%, #c6e0ff 100%);
+
+            /* Text */
+            --text-main: #243b6e;
+            --text-sub: #4869a3;
+
+            /* UI */
+            --radius-lg: 25px;
+            --radius-md: 12px;
+
+            /* Shadows */
+            --shadow-soft: 0 10px 25px rgba(0,0,0,0.12);
+            --shadow-hover: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
         /* register card same aesthetic as home card */
         .register-card {
             width: 70%;
@@ -93,15 +116,13 @@
         }
         /* Premium moving background for all pages */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background: var(--bg-main);
             overflow-x: hidden;
-
-            background: linear-gradient(135deg, #f2f7ff 0%, #ffe3f0 40%, #d7e9ff 100%);
-            background-size: 200% 200%;
-            animation: bgShift 10s ease-in-out infinite;
         }
+
 
         /* slow clean movement */
         @keyframes bgShift {
