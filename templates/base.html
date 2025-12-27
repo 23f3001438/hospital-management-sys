@@ -53,6 +53,75 @@
             transform: translateY(-2px);
         }
 
+        /* =========================
+        Global Button System
+        (Single Source of Truth)
+        ========================= */
+
+        /* Base behavior for all buttons */
+        button,
+        a[class*="btn"] {
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: 0.25s;
+        }
+
+        /* =========================
+        Primary Actions
+        ========================= */
+        .login-btn,
+        .reg-btn,
+        .create-btn {
+            background: linear-gradient(135deg, #6ea8ff, #a689ff);
+            color: white;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+        }
+
+        .login-btn:hover,
+        .reg-btn:hover,
+        .create-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.22);
+            filter: brightness(1.1);
+        }
+
+        /* =========================
+        Secondary Actions
+        ========================= */
+        .view-btn,
+        .edit-btn {
+            background: linear-gradient(135deg, #edf2ff, #e3ebff);
+            color: #2b3f75;
+            box-shadow: 0 3px 10px rgba(43,63,117,0.12);
+        }
+
+        .view-btn:hover,
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.06);
+        }
+
+
+
+        /* =========================
+        Destructive Actions
+        ========================= */
+        .delete-btn,
+        .blacklist-btn {
+            background: linear-gradient(135deg, #ff7b7b, #ff9a9a);
+            color: white;
+            box-shadow: 0 6px 16px rgba(255,123,123,0.35);
+        }
+
+        .delete-btn:hover,
+        .blacklist-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
 
         /* register card same aesthetic as home card */
         .register-card {
