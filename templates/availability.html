@@ -2,60 +2,84 @@
 {% block title %}Set Availability{% endblock %}
 
 {% block content %}
+<style>
+    /* Centered wide action buttons */
+    .btn-center {
+        display: flex;
+        justify-content: center;
+    }
+
+    .wide-btn {
+        min-width: 220px;
+        padding: 0.7rem 1.6rem;
+        font-size: 0.95rem;
+        border-radius: 999px;
+        text-align: center;
+    }
+
+</style>
 <div class="container mt-5">
-    <h3 class="text-center mb-4">Set Your Availability</h3>
+    <div class="card p-4">
+        <h2 class="text-center mb-4">Set Your Availability</h3>
 
-    <form method="POST" action="{{ url_for('doctor_availability', doctor_id=doctor_id) }}">
-        <!-- Select Date -->
-        <div class="mb-3">
-            <label for="date" class="form-label">Select Date</label>
-            <select name="date" id="date" class="form-control" required>
-                <option value="">-- Select Date --</option>
-                {% for d in dates %}
-                    <option value="{{ d }}" {% if selected_date == d %}selected{% endif %}>{{ d }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Show "Load Time Slots" only when no slots are displayed yet -->
-        {% if not selected_date %}
-            <button type="submit" class="btn btn-primary">Load Time Slots</button>
-        {% endif %}
-
-        <!-- Time Slots -->
-        {% if selected_date %}
-        <div class="mb-3">
-            <label class="form-label">Select Time Slots</label>
-            <div class="d-flex flex-wrap">
-                {% for hour in range(10, 18) %}
-                    {% set slot_time = hour|string + ':00' %}
-                    {% set slot_booked = False %}
-                    {% if availability[selected_date] is defined %}
-                        {% for t, is_free in availability[selected_date].items() %}
-                            {% if t.hour == hour %}
-                                {% set slot_booked = not is_free %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                    <div class="form-check me-3 mb-2">
-                        <input class="form-check-input" type="checkbox" name="times" value="{{ hour }}"
-                            id="slot{{ hour }}"
-                            {% if not slot_booked %}checked{% endif %}
->
-                        <label class="form-check-label" for="slot{{ hour }}">
-                            {{ hour }}:00 - {{ hour + 1 }}:00
-                        </label>
-                    </div>
-                {% endfor %}
+        <form method="POST" action="{{ url_for('doctor_availability', doctor_id=doctor_id) }}">
+            <!-- Select Date -->
+            <div class="mb-3">
+                <label for="date" class="form-label">Select Date</label>
+                <select name="date" id="date" class="form-control" required>
+                    <option value="">-- Select Date --</option>
+                    {% for d in dates %}
+                        <option value="{{ d }}" {% if selected_date == d %}selected{% endif %}>{{ d }}</option>
+                    {% endfor %}
+                </select>
             </div>
-        </div>
 
-        <!-- Hidden input to persist date during slot submission -->
-        <input type="hidden" name="date" value="{{ selected_date }}">
+            <!-- Show "Load Time Slots" only when no slots are displayed yet -->
+            {% if not selected_date %}
+                <div class="btn-center">
+                    <button type="submit" class="login-btn wide-btn">Load Time Slots</button>
+                </div>
+            {% endif %}
 
-        <!-- Save Button -->
-        <button type="submit" class="btn btn-success mt-3">Save Availability</button>
-        {% endif %}
-    </form>
+            <!-- Time Slots -->
+            {% if selected_date %}
+            <div class="mb-3">
+                <label class="form-label">Select Time Slots</label>
+                <div class="d-flex flex-wrap">
+                    {% for hour in range(10, 18) %}
+                        {% set slot_time = hour|string + ':00' %}
+                        {% set slot_booked = False %}
+                        {% if availability[selected_date] is defined %}
+                            {% for t, is_free in availability[selected_date].items() %}
+                                {% if t.hour == hour %}
+                                    {% set slot_booked = not is_free %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-check me-3 mb-2">
+                            <input class="form-check-input" type="checkbox" name="times" value="{{ hour }}"
+                                id="slot{{ hour }}"
+                                {% if not slot_booked %}checked{% endif %} >
+                            <label class="form-check-label" for="slot{{ hour }}">
+                                {{ hour }}:00 - {{ hour + 1 }}:00
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Hidden input to persist date during slot submission -->
+            <input type="hidden" name="date" value="{{ selected_date }}">
+
+            <!-- Save Button -->
+            <div class="btn-center mt-3">
+                <button type="submit" class="login-btn wide-btn">
+                    Save Availability
+                </button>
+            </div>
+
+            {% endif %}
+        </form>
+    </div>
 </div>
 {% endblock %}
