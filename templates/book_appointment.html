@@ -2,24 +2,18 @@
 {% block title %}Book Appointment{% endblock %}
 {% block content %}
 <style>
-    .container {
-        max-width: 600px;
+    .book-card {
+        max-width: 620px;
         margin: auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        background-color: #f9f9f9;
+        padding: 2rem;
     }
+
     .form-label { font-weight: bold; }
     .form-select, .btn { width: 100%; padding: 10px; margin-top: 10px; }
-    .btn-primary {
-        background-color: #007bff; color: white; border: none;
-        border-radius: 5px; cursor: pointer;
-    }
-    .btn-primary:hover { background-color: #0056b3; }
+    
 </style>
 
-<div class="container mt-5">
+<div class="card book-card mt-5">
     <h3 class="text-center mb-4">Book Appointment with Dr. {{ doctor.name }}</h3>
 
     <form method="POST" action="{{ url_for('book_appointment', doctor_id=doctor.id) }}">
@@ -47,7 +41,7 @@
                 {% endfor %}
             </select>
         </div>
-        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+        <button type="submit" class="create-btn w-100">Confirm Booking</button>
         {% else %}
         <p class="text-danger">No slots available for this date. Please select another date.</p>
         {% endif %}
