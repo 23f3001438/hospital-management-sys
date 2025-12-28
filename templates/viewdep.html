@@ -4,62 +4,53 @@
 {% block content %}
 {% block home_button %}{% endblock %}
 
-<style>
-    .dept-header {
-        background-color: #a3c4f3;
-        color: white;
-        padding: 1rem;
-        border-radius: 5px;
-        margin-bottom: 1rem;
-    }
-    .doctor-list {
-        margin-top: 1rem;
-    }
-    .doctor-card {
-        border: 1px solid #ddd;
-        padding: 1rem;
-        border-radius: 5px;
-        margin-bottom: 0.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #f9f9f9;
-    }
-    .doctor-card a {
-        text-decoration: none;
-        color: white;
-        background-color: #a3c4f3;
-        padding: 0.5rem 1rem;
-        border-radius: 5px;
-    }
-</style>
+<div class="card" style="max-width: 900px; margin: 0 auto; padding: 2.5rem;">
+    <h2 style="text-align:center; margin-bottom: 0.6rem;">
+        {{ department.name }}
+    </h2>
 
-<div class="dept-header">
-    <h2>{{ department.name }}</h2>
     {% if department.description %}
-        <p>{{ department.description }}</p>
+        <p style="text-align:center; color:#6c7aa0; margin-bottom: 1rem;">
+            {{ department.description }}
+        </p>
     {% endif %}
-    <p>Total Appointments in this Department: 
+
+    <p style="text-align:center; font-size:0.9rem; color:#4b63a8; margin-bottom:2rem;">
+        Total Appointments in this Department:
         {{ doctors | sum(attribute='num_appointments') }}
     </p>
-</div>
 
-<div class="doctor-list">
-    <h3>Doctors in {{ department.name }}</h3>
+    <h3 style="margin-bottom:1.2rem; text-align:center;">
+        Doctors in {{ department.name }}
+    </h3>
+
     {% if doctors %}
-        {% for doctor in doctors %}
-        <div class="doctor-card">
-            <div>
-                <strong>{{ doctor.name }}</strong> <br>
-                Specialization: {{ doctor.specialization }} <br>
-                Appointments: {{ doctor.appointments|length }}
-            </div>
-            <a href="{{ url_for('view_doctor', doctor_id=doctor.id, patient_id=patient.id) }}">View Profile</a>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+            {% for doctor in doctors %}
+                <div class="card" style="padding:1.5rem;">
+                    <h4 style="margin-bottom:0.4rem;">{{ doctor.name }}</h4>
 
+                    <p style="margin:0; color:#4b63a8;">
+                        {{ doctor.specialization }}
+                    </p>
+
+                    <p style="font-size:0.85rem; margin-top:0.6rem; color:#6c7aa0;">
+                        Scheduled Appointments: {{ doctor.num_appointments }}
+                    </p>
+
+                    <a href="{{ url_for('view_doctor', doctor_id=doctor.id, patient_id=patient.id) }}"
+                       class="view-btn"
+                       style="display:block; text-align:center; margin-top:1rem; padding:10px;">
+                        View Profile
+                    </a>
+                </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     {% else %}
-        <p>No doctors available in this department.</p>
+        <p style="text-align:center; color:#6c7aa0;">
+            No doctors available in this department.
+        </p>
     {% endif %}
 </div>
+
 {% endblock %}
