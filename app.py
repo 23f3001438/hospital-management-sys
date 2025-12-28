@@ -607,7 +607,7 @@ def doctor_availability(doctor_id):
 
         db.session.commit()
         flash('Availability updated successfully!', 'success')
-        return redirect(url_for('doctor_availability', doctor_id=doctor_id))
+        return redirect(url_for('docdb', doctor_id=doctor_id))
 
     # Default GET request
     return render_template(

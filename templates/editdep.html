@@ -4,15 +4,56 @@
 {% block content %}
 {% block home_button %}{% endblock %}
 
-    <h2>Edit Department</h2>
-    <form method="POST">
-        <label>Name:</label>
-        <input type="text" name="name" value="{{ department.name }}" required>
-        
-        <label>Description:</label>
-        <textarea name="description">{{ department.description }}</textarea>
-        
-        <button type="submit">Update</button>
+<style>
+    .edit-dep-form .form-control {
+        width: 100%;
+        min-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .edit-dep-form textarea.form-control {
+        resize: vertical;
+    }
+
+    .edit-dep-form .input-group {
+        width: 100%;
+    }
+</style>
+
+
+<div class="card mx-auto" style="max-width: 600px; padding: 2rem;">
+    <h2 class="text-center mb-4">Edit Department</h2>
+
+    <form method="POST" class="d-flex flex-column gap-3 edit-dep-form">
+
+        <div class="input-group">
+            <label class="form-label fw-semibold">Department Name</label>
+            <input
+                type="text"
+                name="name"
+                value="{{ department.name }}"
+                class="form-control"
+                required
+            >
+        </div>
+
+        <div class="input-group">
+            <label class="form-label fw-semibold">Description</label>
+            <textarea
+                name="description"
+                rows="4"
+                class="form-control"
+                required
+            >{{ department.description }}</textarea>
+        </div>
+
+        <div class="text-center mt-3">
+            <button type="submit" class="create-btn px-5 py-2">
+                Update Department
+            </button>
+        </div>
+
     </form>
+</div>
 
 {% endblock %}
