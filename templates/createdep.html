@@ -3,16 +3,18 @@
 
 {%block content%}
 {% block home_button %}{% endblock %}
-
-    <h2>Create Department</h2>
-    <form method="POST">
-        <label for="name">Department Name:</label>
-        <input type="text" name="name" id="name" required>
-
-        <label for="description">Description:</label>
-        <textarea name="description" id="description" rows="3" required></textarea>
-
-        <button type="submit">Create Department</button>
-    </form>
-
+    <div class="card register-card">
+        <h2>Create Department</h2>
+        <form method="POST" class="reg-form">
+            <div class="input-group">
+                <label for="name">Department Name:</label>
+                <input type="text" name="name" id="name" required>
+            </div>
+            <div class="input-group">
+                <label for="description">Description:</label>
+                <textarea name="description" id="description" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="create-btn reg-btn">Create Department</button>
+        </form>
+    </div>
 {%endblock%}
