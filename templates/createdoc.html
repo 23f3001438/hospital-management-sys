@@ -3,40 +3,58 @@
 
 {%block content%}
 {% block home_button %}{% endblock %}
+    <div class="card register-card">
+        <h2 class="reg-title">Create Doctor Profile</h2>
+        <form action="/createdoc" method="POST" class="reg-form">
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
 
-    <h2>Create Doctor Profile</h2>
-    <form action="/createdoc" method="POST">
-        <label for="name">Full Name:</label>
-        <input type="text" id="name" name="name" required>
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
 
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br><br>
+            
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br><br>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
 
-        <label for="specialization">Specialization:</label>
-        <select id="specialization" name="specialization" required>
-            <option value="">--Select Specialization--</option>
-            {% for dept in departments %}
-                <option value="{{ dept.name }}">{{ dept.name }}</option>
-            {% endfor %}
-        </select>
-        <br><br>
+            
+
+            <div class="input-group">
+                <label for="specialization">Specialization</label>
+                <select id="specialization" name="specialization" required>
+                    <option value="">-- Select Specialization --</option>
+                    {% for dept in departments %}
+                        <option value="{{ dept.name }}">{{ dept.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            
 
 
-        <label for="contact">Contact Number:</label>
-        <input type="tel" id="contact" name="contact" required>
-        <br><br>
+            <div class="input-group">
+                <label for="contact">Contact Number</label>
+                <input type="tel" id="contact" name="contact" required>
+            </div>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <br><br>
+            
 
-        
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
 
-        <button type="submit">Create Profile</button>
-    </form>
+            
+
+            
+
+            <button type="submit" class="create-btn reg-btn">Create Profile</button>
+        </form>
+    </div>
 {%endblock%}
