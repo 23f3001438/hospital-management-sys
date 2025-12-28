@@ -2,37 +2,55 @@
 {% block title %}Reschedule Appointment{% endblock %}
 {% block content %}
 
-<div class="container mt-4">
+<div class="card" style="max-width: 480px; margin: 0 auto; padding: 2rem;">
     <h2 class="mb-4 text-center">Reschedule Appointment with Dr. {{ appointment.doctor.name }}</h2>
 
-    <form method="POST" class="p-4 border rounded bg-light">
-        <div class="mb-3">
-            <label for="date" class="form-label">Select New Date:</label>
-            <select name="date" class="form-select" required onchange="window.location.href='?date='+this.value;">
-                <option value="" disabled selected>Choose a date</option>
-                {% for d in available_dates %}
-                    <option value="{{ d }}" {% if selected_date == d %}selected{% endif %}>{{ d }}</option>
-                {% endfor %}
-            </select>
+        <form method="POST" class="reg-form">
 
-        </div>
+            <div class="input-group" style="width: 100%;">
+                <label>Select New Date</label>
+                <select name="date" required onchange="window.location.href='?date='+this.value;">
+                    <option value="" disabled selected>Choose a date</option>
+                    {% for d in available_dates %}
+                        <option value="{{ d }}" {% if selected_date == d %}selected{% endif %}>
+                            {{ d }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        {% if available_times %}
-        <div class="mb-3">
-            <label for="time" class="form-label">Select Time Slot:</label>
-            <select name="time" id="time" class="form-select" required>
-                {% for t in available_times %}
-                    <option value="{{ t }}">{{ t }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        {% endif %}
+            <div class="input-group" style="width: 100%;">
+                <label>Select Time Slot</label>
 
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary">Reschedule</button>
-            <a href="{{ url_for('patientdb', patient_id=appointment.patient_id) }}" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
+                {% if available_times %}
+                    <select name="time" required>
+                        {% for t in available_times %}
+                            <option value="{{ t }}">{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <div style="padding: 0.6rem; text-align:center; color:#6c7aa0; font-size:0.9rem;">
+                        Select a date to view available time slots
+                    </div>
+                {% endif %}
+            </div>
+
+
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="create-btn" style="width:100%; padding:12px;">
+                    Reschedule Appointment
+                </button>
+
+                <a href="{{ url_for('patientdb', patient_id=appointment.patient_id) }}"
+                class="view-btn"
+                style="display:block; text-align:center; margin-top:14px; padding:10px;">
+                    Cancel
+                </a>
+            </div>
+
+
+        </form>
+    </div>    
 </div>
 
 {% endblock %}
