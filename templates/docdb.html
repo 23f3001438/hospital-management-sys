@@ -5,135 +5,211 @@
 {% block content %}
 {% block home_button %}{% endblock %}
 
-<div class="header" style="background-color: #a2d2ff; color: #023047; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
-    <h1>Welcome Dr. {{ doctor.name }}</h1>
-    <a href="{{ url_for('logout') }}" style="color: #023047; text-decoration: none; font-size: 1rem; background-color: #ffadad; padding: 0.5rem 1rem; border-radius: 5px;">Logout</a>
-</div>
+<style>
+    .doctor-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        margin-bottom: 2rem;
+    }
+    .section-card .table {
+        background: transparent !important;
+        --bs-table-bg: transparent !important;
+    }
 
-<!-- Availability Section -->
-<div class="section mt-4">
-    <a href="{{ url_for('doctor_availability', doctor_id=doctor.id) }}" class="btn btn-primary mb-3">
-        Manage Availability
-    </a>
+    .section-card .table thead th {
+        background: rgba(255,255,255,0.35) !important;
+        backdrop-filter: blur(8px);
+    }
 
-    <h2>Availability (Next 7 Days)</h2>
-    {% if dates %}
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover mt-2 text-center align-middle">
-            <thead class="table-secondary">
-                <tr>
-                    <th>Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for d in dates %}
+    .section-card .table tbody tr {
+        background: rgba(255,255,255,0.18);
+    }
+    /* Doctor dashboard button sizing */
+    .section-card .create-btn,
+    .section-card .edit-btn,
+    .section-card .view-btn,
+    .section-card .delete-btn {
+        padding: 0.55rem 1.4rem;
+        font-size: 0.95rem;
+        border-radius: 999px;
+    }
+
+    .availability-yes {
+        color: #4f7cff; /* soft blue */
+        font-weight: 600;
+    }
+
+    .availability-no {
+        color: #ff6b6b; /* soft red */
+        font-weight: 600;
+    }
+    /* ===== Doctor Dashboard Button Fix ===== */
+    .header .create-btn,
+    .header .delete-btn {
+        padding: 10px 22px;
+        font-size: 0.95rem;
+        border-radius: 999px;
+        min-width: 170px;
+        text-align: center;
+    }
+
+
+</style>
+<div class="dashboard-container">
+    <div class="header card" style="text-align:center; padding:2rem;">
+        <h1 style="margin-bottom:1rem;">Welcome Dr. {{ doctor.name }}</h1>
+
+        <div style="display:flex; justify-content:center; gap:14px;">
+            <a href="{{ url_for('doctor_availability', doctor_id=doctor.id) }}" class="create-btn">
+                Manage Availability
+            </a>
+
+            <a href="{{ url_for('logout') }}" class="delete-btn">
+                Logout
+            </a>
+        </div>
+    </div>
+
+
+
+
+    <!-- Availability Section -->
+    <div class="card section-card mt-4">
+        <div class="text-center mb-3">
+
+        </div>
+
+
+        {% if dates %}
+        <div class="table-responsive">
+            <table class="table mt-2 align-middle">
+                <thead class="text-center">
                     <tr>
-                        <td>{{ d.strftime('%d/%m/%Y') }}</td>
-                        <td>
-                            {% if availability[d]|length > 0 %}
-                                <span style="color:green;">Available</span>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in dates %}
+                        <tr>
+                            <td class="text-center">{{ d.strftime('%d/%m/%Y') }}</td>
+                            <td class="text-center">
+                                {% if availability[d]|length > 0 %}
+                                    <span class="availability-yes">Available</span>
+                                {% else %}
+                                    <span class="availability-no">Not Available</span>
+                                {% endif %}
+                            </td>
+
+
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No availability data for the next 7 days.</p>
+        {% endif %}
+    </div>
+
+    </div>
+
+    <!-- Assigned Patients Section -->
+    <div class="card section-card mt-4">
+        <h2 class="text-center">Assigned Patients</h2>
+
+        <div class="d-flex justify-content-center flex-wrap gap-3 mt-3">
+            {% for patient in assigned_patients %}
+            <div class="card" style="padding:1rem 1.4rem; min-width:220px;">
+                <div style="font-weight:600; margin-bottom:0.5rem;">
+                    {{ patient.first_name }} {{ patient.last_name }}
+                </div>
+                <div class="text-center">
+                    <a href="{{ url_for('view_patient_profile', patient_id=patient.id) }}" class="view-btn">
+                        View
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-center">No patients assigned.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <!-- Appointments Section -->
+    <div class="card section-card mt-4">
+        <h2 class="text-center">Upcoming Appointments</h2>
+        {% if appointments %}
+        <div class="table-responsive">
+            <table class="table mt-2 align-middle">
+                <thead class="text-center">
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Patient</th>
+                        <th>Status</th>
+                        <th>Update Status</th>
+                        <th>Medical Record</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr>
+                        <td class="text-center">{{ appt.date.strftime('%d-%b-%Y') }}</td>
+                        <td class="text-center">{{ appt.time.strftime('%I:%M %p') }}</td>
+                        <td>{{ appt.patient.first_name }} {{ appt.patient.last_name }}</td>
+                        
+                        <!-- Status -->
+                        <td class="text-center">
+                            {% if appt.status == 'Scheduled' %}
+                                <span class="view-btn">{{ appt.status }}</span>
+                            {% elif appt.status == 'Completed' %}
+                                <span class="edit-btn">{{ appt.status }}</span>
                             {% else %}
-                                <span style="color:red;">Not Available</span>
+                                <span class="delete-btn">{{ appt.status }}</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Update Status -->
+                        <td class="text-center">
+                            <form action="{{ url_for('update_appointment_status', id=appt.id) }}" method="POST" class="d-flex justify-content-center">
+                                <select name="status" class="form-select form-select-sm me-1">
+                                    <option value="Scheduled" {% if appt.status=='Scheduled' %}selected{% endif %}>Scheduled</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                                <button type="submit" class="edit-btn">Update</button>
+                            </form>
+                        </td>
+
+                        <!-- Medical Record -->
+                        <td>
+                            {% if appt.medical_record %}
+                            <div class="card" style="padding:0.8rem;">
+                                <small><strong>Diagnosis:</strong> {{ appt.medical_record.diagnosis }}</small><br>
+                                <small><strong>Treatment:</strong> {{ appt.medical_record.treatment }}</small><br>
+                                <small><strong>Prescription:</strong> {{ appt.medical_record.prescription }}</small><br>
+                                <a href="{{ url_for('record_details', appointment_id=appt.id) }}" class="create-btn mt-1">Edit</a>
+                            </div>
+                            {% else %}
+                            <a href="{{ url_for('record_details', appointment_id=appt.id) }}" class="create-btn">Add</a>
                             {% endif %}
                         </td>
 
                     </tr>
-                {% endfor %}
-
-            </tbody>
-        </table>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No upcoming appointments.</p>
+        {% endif %}
     </div>
-    {% else %}
-    <p>No availability data for the next 7 days.</p>
-    {% endif %}
 </div>
-
-</div>
-
-<!-- Assigned Patients Section -->
-<div class="section mt-4">
-    <h2>Assigned Patients</h2>
-    {% for patient in assigned_patients %}
-    <div class="list-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border: 1px solid #dee2e6; border-radius: 5px; margin-bottom: 0.5rem; background-color: #ffffff;">
-        <span>{{ patient.first_name }} {{ patient.last_name }}</span>
-        <a href="{{ url_for('view_patient_profile', patient_id=patient.id) }}" class="btn btn-info btn-sm">View</a>
-    </div>
-    {% else %}
-    <p>No patients assigned.</p>
-    {% endfor %}
-</div>
-
-<!-- Appointments Section -->
-<div class="section mt-4">
-    <h2>Upcoming Appointments</h2>
-    {% if appointments %}
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover mt-2 align-middle">
-            <thead class="table-secondary text-center">
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Patient</th>
-                    <th>Status</th>
-                    <th>Update Status</th>
-                    <th>Medical Record</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for appt in appointments %}
-                <tr>
-                    <td class="text-center">{{ appt.date.strftime('%d-%b-%Y') }}</td>
-                    <td class="text-center">{{ appt.time.strftime('%I:%M %p') }}</td>
-                    <td>{{ appt.patient.first_name }} {{ appt.patient.last_name }}</td>
-                    
-                    <!-- Status -->
-                    <td class="text-center">
-                        {% if appt.status == 'Scheduled' %}
-                            <span class="badge bg-warning text-dark">{{ appt.status }}</span>
-                        {% elif appt.status == 'Completed' %}
-                            <span class="badge bg-success">{{ appt.status }}</span>
-                        {% else %}
-                            <span class="badge bg-danger">{{ appt.status }}</span>
-                        {% endif %}
-                    </td>
-
-                    <!-- Update Status -->
-                    <td class="text-center">
-                        <form action="{{ url_for('update_appointment_status', id=appt.id) }}" method="POST" class="d-flex justify-content-center">
-                            <select name="status" class="form-select form-select-sm me-1">
-                                <option value="Scheduled" {% if appt.status=='Scheduled' %}selected{% endif %}>Scheduled</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Cancelled">Cancelled</option>
-                            </select>
-                            <button type="submit" class="btn btn-sm btn-primary">Update</button>
-                        </form>
-                    </td>
-
-                    <!-- Medical Record -->
-                    <td>
-                        {% if appt.medical_record %}
-                        <div class="p-2 border rounded bg-light">
-                            <small><strong>Diagnosis:</strong> {{ appt.medical_record.diagnosis }}</small><br>
-                            <small><strong>Treatment:</strong> {{ appt.medical_record.treatment }}</small><br>
-                            <small><strong>Prescription:</strong> {{ appt.medical_record.prescription }}</small><br>
-                            <a href="{{ url_for('record_details', appointment_id=appt.id) }}" class="btn btn-sm btn-success mt-1">Edit</a>
-                        </div>
-                        {% else %}
-                        <a href="{{ url_for('record_details', appointment_id=appt.id) }}" class="btn btn-sm btn-success">Add</a>
-                        {% endif %}
-                    </td>
-
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <p>No upcoming appointments.</p>
-    {% endif %}
-</div>
-
 
 
 {% endblock %}
