@@ -4,43 +4,49 @@
 {% block content %}
 {% block home_button %}{% endblock %}
 
-  <h1>Patient Profile</h1>
-  <p>firstName: {{ patient.first_name }}</p>
-  <p>lastName: {{ patient.last_name }}</p>
-  <p>Username: {{ patient.username }}</p>
-  <p>Email: {{ patient.email }}</p>
-  <p>Contact: {{ patient.contact }}</p>
-  <p>DOB: {{ patient.dob }}</p>
-  <p>Gender: {{ patient.gender }}</p>
-  <p>Address: {{ patient.address }}</p>
+<div class="card" style="max-width: 600px; margin: 0 auto 2.5rem; padding: 2rem;">
+    <h1 style="text-align:center;">Patient Profile</h1>
 
-    <h2>Medical History</h2>
+    <div style="display:grid; grid-template-columns: 140px 20px auto; row-gap: 0.6rem; margin-top: 1.5rem;">
+        <strong>First Name</strong><span>:</span><span>{{ patient.first_name }}</span>
+        <strong>Last Name</strong><span>:</span><span>{{ patient.last_name }}</span>
+        <strong>Username</strong><span>:</span><span>{{ patient.username }}</span>
+        <strong>Email</strong><span>:</span><span>{{ patient.email }}</span>
+        <strong>Contact</strong><span>:</span><span>{{ patient.contact }}</span>
+        <strong>DOB</strong><span>:</span><span>{{ patient.dob }}</span>
+        <strong>Gender</strong><span>:</span><span>{{ patient.gender }}</span>
+        <strong>Address</strong><span>:</span><span>{{ patient.address }}</span>
+    </div>
+</div>
+
+
+    <h2 style="text-align:center; margin-bottom: 1rem;">Medical History</h2>
     {% if patient.medical_records %}
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-secondary text-center">
-                <tr>
-                    <th>Date</th>
-                    <th>Diagnosis</th>
-                    <th>Treatment</th>
-                    <th>Prescription</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for record in patient.medical_records %}
-                <tr>
-                    <td class="text-center">{{ record.date.strftime('%d-%b-%Y') }}</td>
-                    <td>{{ record.diagnosis or '-' }}</td>
-                    <td>{{ record.treatment or '-' }}</td>
-                    <td>{{ record.prescription or '-' }}</td>
-                    <td>
-                        <a href="{{ url_for('record_details', appointment_id=record.appointment_id) }}" class="btn btn-sm btn-success">Edit</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="card" style="max-width: 90%; margin: 0 auto 3rem; padding: 1.5rem;">
+        <div class="table-responsive">
+            <table class="table align-middle text-center" style="background: transparent;">
+                <thead style="background: rgba(255,255,255,0.45);
+    backdrop-filter: blur(8px);">
+                    <tr background: rgba(255,255,255,0.25);>
+                        <th>Date</th>
+                        <th>Diagnosis</th>
+                        <th>Treatment</th>
+                        <th>Prescription</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in patient.medical_records %}
+                    <tr background: rgba(255,255,255,0.25);>
+                        <td class="text-center">{{ record.date.strftime('%d-%b-%Y') }}</td>
+                        <td class="text-center">{{ record.diagnosis or '-' }}</td>
+                        <td class="text-center">{{ record.treatment or '-' }}</td>
+                        <td class="text-center">{{ record.prescription or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     {% else %}
     <p>No medical records available for this patient.</p>
