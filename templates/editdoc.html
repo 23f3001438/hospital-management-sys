@@ -4,40 +4,69 @@
 {%block content%}
 {% block home_button %}{% endblock %}
 
-    <h2>Edit Doctor Profile</h2>
-    <form action="{{ url_for('edit_doctor', doctor_id=doctor.id) }}" method="POST">
-        <label for="name">Full Name:</label>
-        <input type="text" id="name" name="name" value="{{ doctor.name }}" required>
+<style>
+    .edit-doc-form input,
+    .edit-doc-form select {
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" value="{{ doctor.username }}" required>
-        <br><br>
+    .edit-doc-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+</style>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" value="{{ doctor.password }}" required>
-        <br><br>
+<div class="card register-card">
+    <h2 class="reg-title">Edit Doctor Profile</h2>
 
-       <label for="specialization">Specialization:</label>
-        <select id="specialization" name="specialization" required>
-            <option value="">--Select Specialization--</option>
-            {% for dept in departments %}
-                <option value="{{ dept.name }}" {% if dept.name == doctor.specialization %}selected{% endif %}>
-                    {{ dept.name }}
-                </option>
-            {% endfor %}
-        </select>
-        <br><br>
+    <form action="{{ url_for('edit_doctor', doctor_id=doctor.id) }}"
+          method="POST"
+          class="reg-form">
 
+        <div class="input-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" value="{{ doctor.name }}" required>
+        </div>
 
-        <label for="contact">Contact Number:</label>
-        <input type="tel" id="contact" name="contact" value="{{ doctor.contact }}" required>
-        <br><br>
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="{{ doctor.username }}" required>
+        </div>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="{{ doctor.email }}" required>
-        <br><br>
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
 
-        
-        <button type="submit">Update Profile</button>
+        <div class="input-group">
+            <label for="specialization">Specialization</label>
+            <select id="specialization" name="specialization" required>
+                {% for dept in departments %}
+                    <option value="{{ dept.name }}"
+                        {% if dept.name == doctor.specialization %}selected{% endif %}>
+                        {{ dept.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="contact">Contact Number</label>
+            <input type="tel" id="contact" name="contact" value="{{ doctor.contact }}" required>
+        </div>
+
+        <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ doctor.email }}" required>
+        </div>
+
+        <button type="submit" class="reg-btn pink">
+            Update Profile
+        </button>
+
     </form>
+</div>
+
 {%endblock%}
