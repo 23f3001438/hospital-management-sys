@@ -5,33 +5,69 @@
 {% block home_button %}{% endblock %}
 
 <style>
-    .btn-success {
-        background-color: #28a745;
-        color: white;
-        padding: 10px 20px;
+    .profile-details {
+        max-width: 420px;
+        margin: 1.5rem auto;
+        text-align: left;
+    }
+
+    .profile-details .row {
+        display: grid;
+        grid-template-columns: 130px 15px auto;
+        gap: 6px;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+    }
+
+    .profile-details .label {
+        font-weight: 600;
+        color: #2b3f75;
+    }
+
+    .profile-details .colon {
         text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 10px 2px;
-        cursor: pointer;
-        border: none;
-        border-radius: 5px;
+    }
+
+    .profile-details .value {
+        color: #243b6e;
+        word-break: break-word;
     }
 </style>
 
-  <h1>{{doctor.name}} Profile</h1>
-  <p>Name: {{ doctor.name }}</p>
-  <p>Username: {{ doctor.username }}</p>
-  <p>Email: {{ doctor.email }}</p>
-  <p>Contact: {{ doctor.contact }}</p>
-  <p>Specialization: {{ doctor.specialization }}</p>
 
-<a href="{{ url_for('book_appointment', patient_id=patient.id, doctor_id=doctor.id) }}" class="btn btn-success">
-    Book Appointment
-</a>
+<div class="card" style="max-width: 600px; margin: 2.5rem auto; padding: 2rem; text-align: center;">
+    <h1 style="margin-bottom: 1.5rem;">Dr. {{ doctor.name }}</h1>
+
+    <div class="profile-details">
+        <div class="row">
+            <span class="label">Username</span>
+            <span class="colon">:</span>
+            <span class="value">{{ doctor.username }}</span>
+        </div>
+        <div class="row">
+            <span class="label">Email</span>
+            <span class="colon">:</span>
+            <span class="value">{{ doctor.email }}</span>
+        </div>
+        <div class="row">
+            <span class="label">Contact</span>
+            <span class="colon">:</span>
+            <span class="value">{{ doctor.contact }}</span>
+        </div>
+        <div class="row">
+            <span class="label">Specialization</span>
+            <span class="colon">:</span>
+            <span class="value">{{ doctor.specialization }}</span>
+        </div>
+    </div>
 
 
+    <a href="{{ url_for('book_appointment', patient_id=patient.id, doctor_id=doctor.id) }}"
+    class="view-btn"
+    style="display:inline-block; padding: 12px 28px; font-size: 1rem; background: linear-gradient(135deg, #fd86ff, #c2a8ff) !important;">
+        Book Appointment
+    </a>
 
+</div>
 
 {% endblock %}
