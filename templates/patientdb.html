@@ -2,131 +2,177 @@
 {% block title %}Patient Dashboard{% endblock %}
 {% block content %}
 {% block home_button %}{% endblock %}
-
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f8f5f9;
-        margin: 0;
-        padding: 0;
+
+    /* ===== GLOBAL TABLE UPGRADE ===== */
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: rgba(255,255,255,0.45);
+        backdrop-filter: blur(12px);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
     }
-    .header {
-        background-color: #a3c4f3;
-        color: #ffffff;
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .header h1 { margin: 0; }
-    .header .links a {
-        color: #ffffff;
-        text-decoration: none;
-        margin-left: 1rem;
-        font-size: 1rem;
-    }
-    .section { margin: 1rem auto; padding: 0 1rem; }
-    .section h2 { margin-bottom: 1rem; }
-    .list-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        margin-bottom: 0.5rem;
-        background-color: #ffffff;
-    }
-    .list-item span { flex: 1; }
-    .list-item .view-btn {
-        background-color: #a3c4f3;
-        color: #ffffff;
-        padding: 0.5rem;
+
+    .table thead th {
+        background: linear-gradient(135deg, #c6e0ff, #ffd6e8);
+        color: #243b6e;
+        font-weight: 600;
         border: none;
-        border-radius: 5px;
-        cursor: pointer;
+        padding: 14px;
+        text-align: center;
     }
-    .table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    .table th, .table td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
-    .table th { background-color: #a3c4f3; color: #ffffff; }
-    .table .cancel-btn { background-color: white; padding: 0.5rem; border: none; border-radius: 5px; cursor: pointer; }
+
+    .table tbody td {
+        border: none;
+        padding: 14px;
+        color: #2b3f75;
+        vertical-align: middle;
+    }
+
+    .table tbody tr {
+        transition: background 0.25s;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(255,255,255,0.65);
+    }
+    /* ===== FORCE BUTTON SIZE ===== */
+
+    button,
+    .edit-btn,
+    .view-btn,
+    .create-btn,
+    .delete-btn {
+        padding: 10px 18px !important;
+        font-size: 0.95rem;
+        min-width: 110px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* ===== SEARCH BAR FIX ===== */
+
+    .search-bar {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .search-bar input {
+        flex: 1;
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid #cbd6f3;
+    }
+
+
 </style>
 
-<div class="header">
-    <h1>Welcome {{ patient.first_name }}</h1>
-    <div class="links">
-        <a href="{{ url_for('edit_patient', patient_id=patient.id) }}">Edit Profile</a>
-        <a href="{{ url_for('view_patient_profile', patient_id=patient.id) }}">Profile</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
+<div class="card" style="max-width: 900px; margin: 0 auto 2rem; padding: 1.8rem;">
+    <h1 style="text-align:center; margin-bottom:1rem; font-family:Georgia, 'Times New Roman', Times, serif">
+        Welcome {{ patient.first_name }}
+    </h1>
+
+    <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
+        <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="edit-btn">Edit Profile</a>
+        <a href="{{ url_for('view_patient_profile', patient_id=patient.id) }}" class="view-btn">Profile</a>
+        <a href="{{ url_for('logout') }}" class="delete-btn">Logout</a>
     </div>
 </div>
 
-<div class="section">
-    <h2>Departments</h2>
-    {% for dept in departments %}
-    <div class="list-item">
-        <span>{{ dept.name }}</span>
-        <a href="{{ url_for('view_department', dept_id=dept.id, patient_id=patient.id) }}">
-            <button class="view-btn">View Details</button>
-        </a>
+
+<div class="card" style="max-width: 900px; margin: 0 auto 2rem; padding: 2rem;">
+    <h2 style="text-align:center;">Departments</h2>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; margin-top:1.5rem;">
+        {% for dept in departments %}
+            <div class="card" style="padding:1.2rem; text-align:center;">
+                <strong style="font-size:1.05rem;">{{ dept.name }}</strong>
+
+                <div style="margin-top:0.8rem;">
+                    <a href="{{ url_for('view_department', dept_id=dept.id, patient_id=patient.id) }}"
+                       class="view-btn">
+                        View Doctors
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
     </div>
-    {% else %}
-    <p>No departments available.</p>
-    {% endfor %}
-</div>
-<form action="{{ url_for('search_doctors', patient_id=patient.id) }}" method="GET" style="margin-bottom: 1rem;">
-    <input type="text" name="query" placeholder="Search doctors by name or specialization" style="padding: 0.5rem; width: 70%;">
-    <button type="submit" style="padding: 0.5rem; background-color: #a3c4f3; border: none; color: white; border-radius: 5px; cursor: pointer;">
-        Search
-    </button>
-</form>
-
-<div class="section">
-    <h2>Upcoming Appointments</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Sr No.</th>
-                <th>Doctor Name</th>
-                <th>Specialization</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if upcoming_appointments %}
-                {% for appointment in upcoming_appointments %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>
-                        <a href="{{ url_for('view_doctor', doctor_id=appointment.doctor.id, patient_id=patient.id) }}">
-                            {{ appointment.doctor.name }}
-                        </a>
-                    </td>
-                    <td>{{ appointment.doctor.specialization }}</td>
-                    <td>{{ appointment.date.strftime('%d/%m/%Y') }}</td>
-                    <td>{{ appointment.time.strftime('%I:%M %p') }}</td>
-                    <td>
-                        <form action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}" method="POST" style="display:inline;">
-                            <button class="cancel-btn" type="submit">Cancel</button>
-                        </form>
-                        <form action="{{ url_for('reschedule_appointment', appointment_id=appointment.id) }}" method="GET" style="display:inline;">
-                            <button class="cancel-btn" type="submit">Reschedule</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="6">No upcoming appointments.</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
 </div>
 
-<div class="section">
+<div class="card" style="max-width:900px; margin:0 auto 2rem; padding:1.5rem;">
+    <form class="search-bar"
+          action="{{ url_for('search_doctors', patient_id=patient.id) }}"
+          method="GET">
+        <input type="text" name="query"
+               placeholder="Search doctors by name or specialization">
+        <button class="create-btn">Search</button>
+    </form>
+</div>
+
+
+
+<div class="card" style="max-width:1100px; margin:0 auto 2.5rem; padding:2rem;">
+    <h2 style="text-align:center;">Upcoming Appointments</h2>
+
+    <div class="table-responsive">
+        <table class="table align-middle text-center">
+            <thead>
+                <tr>
+                    <th>Sr No.</th>
+                    <th>Doctor Name</th>
+                    <th>Specialization</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if upcoming_appointments %}
+                    {% for appointment in upcoming_appointments %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <a href="{{ url_for('view_doctor', doctor_id=appointment.doctor.id, patient_id=patient.id) }}">
+                                {{ appointment.doctor.name }}
+                            </a>
+                        </td>
+                        <td>{{ appointment.doctor.specialization }}</td>
+                        <td>{{ appointment.date.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ appointment.time.strftime('%I:%M %p') }}</td>
+                        <td>
+                            <form action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}"
+                                method="POST" style="display:inline;">
+                                <button class="delete-btn">Cancel</button>
+                            </form>
+
+                            <form action="{{ url_for('reschedule_appointment', appointment_id=appointment.id) }}"
+                                method="GET" style="display:inline;">
+                                <button class="edit-btn">Reschedule</button>
+                            </form>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding:1.2rem;">
+                            No upcoming appointments.
+                        </td>
+                    </tr>
+
+                {% endif %}
+            </tbody>
+        </table>
+    </div>    
+</div>
+
+<div class="card" style="max-width:1100px; margin:0 auto 2.5rem; padding:2rem;">
     <h2>Past Appointments</h2>
     <table class="table">
         <thead>
