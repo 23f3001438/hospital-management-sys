@@ -12,8 +12,8 @@
     }
     .table thead th {
         position: sticky;
-        top: 0;
-        background-color: #f8f9fa;
+        background: rgba(255, 255, 255, 0.28);
+        backdrop-filter: blur(10px);
         z-index: 1;
     }
     .container {
@@ -39,6 +39,36 @@
     {
         margin-top: 10px;
     }
+    .table tbody tr {
+        background: rgba(255, 255, 255, 0.18);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.28);
+    }
+    .badge {
+        padding: 0.4rem 0.7rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+
+    .badge-danger {
+        background: linear-gradient(135deg, #ff7b7b, #ff9a9a);
+        color: white;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, #7be0a1, #9af5c4);
+        color: #1f4d33;
+    }
+
+    .badge-neutral {
+        background: rgba(255,255,255,0.6);
+        color: var(--text-main);
+}
+
+
 
 </style>
 <div class="container mt-4">
@@ -47,81 +77,85 @@
     <div class="row">
         <!-- Upcoming Appointments -->
         <div class="col-md-6">
-            <h4 class="text-primary text-center">Upcoming Appointments</h4>
-            {% if upcoming_appointments %}
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover mt-3">
-                    <thead class="table-primary text-center">
-                        <tr>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Patient</th>
-                            <th>Doctor</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for a in upcoming_appointments %}
-                        <tr>
-                            <td>{{ a.date }}</td>
-                            <td>{{ a.time.strftime('%I:%M %p') if a.time else '-' }}</td>
-                            <td>{{ a.patient.first_name }}</td>
-                            <td>{{ a.doctor.name }}</td>
-                            <td>{{ a.status }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="card section-card">
+                <h4 class="text-primary text-center">Upcoming Appointments</h4>
+                {% if upcoming_appointments %}
+                <div class="table-responsive">
+                    <table class="table mt-3">
+                        <thead class="text-center">
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in upcoming_appointments %}
+                            <tr>
+                                <td>{{ a.date }}</td>
+                                <td>{{ a.time.strftime('%I:%M %p') if a.time else '-' }}</td>
+                                <td>{{ a.patient.first_name }}</td>
+                                <td>{{ a.doctor.name }}</td>
+                                <td>{{ a.status }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <p class="text-muted text-center mt-3">No upcoming appointments.</p>
+                {% endif %}
             </div>
-            {% else %}
-                <p class="text-muted text-center mt-3">No upcoming appointments.</p>
-            {% endif %}
         </div>
 
         <!-- Past Appointments -->
         <div class="col-md-6">
-            <h4 class="text-secondary text-center">Past / Completed / Cancelled</h4>
-            {% if past_appointments %}
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover mt-3">
-                    <thead class="table-secondary text-center">
-                        <tr>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Patient</th>
-                            <th>Doctor</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for a in past_appointments %}
-                        <tr>
-                            <td>{{ a.date }}</td>
-                            <td>{{ a.time.strftime('%I:%M %p') if a.time else '-' }}</td>
-                            <td>{{ a.patient.first_name }}</td>
-                            <td>{{ a.doctor.name }}</td>
-                            <td>
-                                {% if a.status == 'Cancelled' %}
-                                    <span class="badge bg-danger">Cancelled</span>
-                                {% elif a.status == 'Completed' %}
-                                    <span class="badge bg-success">Completed</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">{{ a.status }}</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="card section-card">
+                <h4 class="text-secondary text-center">Past / Completed / Cancelled</h4>
+                {% if past_appointments %}
+                <div class="table-responsive">
+                    <table class="table mt-3">
+                        <thead class="table-secondary text-center">
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in past_appointments %}
+                            <tr>
+                                <td>{{ a.date }}</td>
+                                <td>{{ a.time.strftime('%I:%M %p') if a.time else '-' }}</td>
+                                <td>{{ a.patient.first_name }}</td>
+                                <td>{{ a.doctor.name }}</td>
+                                <td>
+                                    {% if a.status == 'Cancelled' %}
+                                        <span class="badge badge-danger">Cancelled</span>
+                                    {% elif a.status == 'Completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ a.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <p class="text-muted text-center mt-3">No past or completed appointments.</p>
+                {% endif %}
             </div>
-            {% else %}
-                <p class="text-muted text-center mt-3">No past or completed appointments.</p>
-            {% endif %}
         </div>
     </div>
 
     <div class="text-center mt-4">
-        <a href="{{ url_for('admindb') }}" class="btn btn-outline-primary">Back to Dashboard</a>
+        <a href="{{ url_for('admindb') }}" class="btn view-btn">Back to Dashboard</a>
     </div>
 </div>
 {% endblock %}
