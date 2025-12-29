@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta, time
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'archimangla'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-fallback-key')
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
