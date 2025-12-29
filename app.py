@@ -17,12 +17,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-with app.app_context():
-    db.create_all()
-    adm()
-
-from werkzeug.security import generate_password_hash
-
 def adm():
     admin = Admin.query.filter_by(username='archimangla1409').first()
     if not admin:
@@ -30,6 +24,13 @@ def adm():
         admin = Admin(username='archimangla1409', contact=1234567890, password=hashed_pw, name='Archi Mangla')
         db.session.add(admin)
         db.session.commit() 
+
+with app.app_context():
+    db.create_all()
+    adm()
+
+from werkzeug.security import generate_password_hash
+
 
 
 @app.route('/')
