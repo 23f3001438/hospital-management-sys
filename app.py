@@ -34,6 +34,11 @@ def adm():
 def home():
     return render_template('home.html')
 
+@app.route("/healthz")
+def healthz():
+    return "ok", 200
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
