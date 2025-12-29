@@ -17,17 +17,19 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
+with app.app_context():
+    db.create_all()
+    adm()
+
 from werkzeug.security import generate_password_hash
 
 def adm():
-    with app.app_context():
-        db.create_all()  # Create tables if they don't exist
-        admin = Admin.query.filter_by(username='archimangla1409').first()
-        if not admin:
-            hashed_pw = generate_password_hash('archi123', method='pbkdf2:sha256')
-            admin = Admin(username='archimangla1409', contact=1234567890, password=hashed_pw, name='Archi Mangla')
-            db.session.add(admin)
-            db.session.commit()
+    admin = Admin.query.filter_by(username='archimangla1409').first()
+    if not admin:
+        hashed_pw = generate_password_hash('archi123', method='pbkdf2:sha256')
+        admin = Admin(username='archimangla1409', contact=1234567890, password=hashed_pw, name='Archi Mangla')
+        db.session.add(admin)
+        db.session.commit() 
 
 
 @app.route('/')
@@ -887,5 +889,4 @@ def admin_appointments():
 
 
 if __name__ == '__main__':
-    adm()
     app.run(host="0.0.0.0", port=5000)
