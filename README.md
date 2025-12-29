@@ -1,6 +1,8 @@
 # hospital-management-sys
 MAD I project; Sept term
 
+https://healthsync-hms.onrender.com 
+
 **HealthSync: Bridging the Gap in Healthcare Management**
 
 HealthSync is a full-stack Hospital Management System (HMS) designed to simplify the often chaotic workflows between patients, doctors, and administrators. Built with Flask, this project focuses on role-based logic and seamless appointment scheduling, ensuring that the right people get the right information at the right time.
